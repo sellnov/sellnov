@@ -1,5 +1,5 @@
 Ext.define('Sellnov.view.Main', {
-    extend: 'Ext.container.Container',
+    extend: 'Ext.Panel',
     requires:[
         'Ext.tab.Panel',
         'Sellnov.store.MainMenu',
@@ -11,11 +11,30 @@ Ext.define('Sellnov.view.Main', {
     layout: {
         type: 'border'
     },
-
+    dockedItems: [{
+        xtype: 'toolbar',
+        dock: 'top',
+        style: {
+            background: '#345',
+            color: '#fff'
+        },
+        items: [{
+            xtype: 'container',
+            html: 'Sellnov &copy; 2013 NTSmedia',
+            padding: '5 5 5 5'
+        },{
+            xtype: 'tbfill'
+        },{
+            xtype: 'combo',
+            fieldLabel: 'Podmiot',
+            margin: '5 5 5 5',
+            labelAlign: 'right',
+            labelStyle: 'color: #fff'
+        }]
+    }],
     items: [{
         region: 'west',
         xtype: 'treepanel',
-        title: 'Sellnov &copy; 2013 NTSmedia',
         rootVisible: false,
         width: '20%',
         store: 'MainMenu',

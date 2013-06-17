@@ -19,17 +19,16 @@ Ext.define('Sellnov.view.SaleInvoice', {
         items: [{
             xtype: 'panel',
             region: 'west',
-            flex: 1,
+            flex: 2,
             items: [{
                 xtype: 'combo',
                 margin: '10 5 5 5',
                 fieldLabel: 'Klient',
-                labelAlign: 'top',
             }]
         },{
             xtype: 'panel',
             region: 'center',
-            flex: 2,
+            flex: 1,
             style: {
                 'text-align': 'center'
             },
@@ -37,15 +36,19 @@ Ext.define('Sellnov.view.SaleInvoice', {
         },{
             xtype: 'panel',
             region: 'east',
-            flex: 1,
+            flex: 2,
+            align: 'right',
+            layout: 'vbox',
+            pack: 'end',
+            defaults: {
+                pack: 'end',
+            },
             items: [{
                 margin: '10 0 5 0',
                 xtype: 'datefield',
-                labelAlign: 'top',
                 fieldLabel: 'Data wystawienia'
             },{
                 xtype: 'datefield',
-                labelAlign: 'top',
                 fieldLabel: 'Data sprzedaży'
             }]
         }]

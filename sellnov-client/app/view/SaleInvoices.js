@@ -11,7 +11,7 @@ Ext.define('Sellnov.view.SaleInvoices', {
     tbar: [{
         xtype: 'button', 
         text: 'Nowa faktura VAT', 
-        cls: 'icon-add', 
+        cls: 'x-icon-add', 
         listeners: {
             click: function() {
                 var win = Ext.create('Ext.window.Window', {
