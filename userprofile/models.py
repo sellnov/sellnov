@@ -11,6 +11,8 @@ class BusinessEntity(models.Model):
     city = models.CharField(max_length=64)
     nip = models.CharField(max_length=16)
     regon = models.CharField(max_length=8)
+    phone = models.CharField(max_length=64, null=True, blank=True)
+    email = models.EmailField(max_length=255, null=True, blank=True)
 
     bank_name = models.CharField(max_length=64)
     iban = models.CharField(max_length=32)
@@ -18,4 +20,6 @@ class BusinessEntity(models.Model):
     owner = models.ForeignKey('auth.User')
     employers = models.ManyToManyField('auth.User', related_name='works_in')
 
+    def __unicode__(self):
+        return self.name
 

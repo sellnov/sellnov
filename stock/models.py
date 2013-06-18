@@ -4,10 +4,16 @@ from django.db import models
 class Unit(models.Model):
     name = models.CharField(max_length=16)
 
+    def __unicode__(self):
+        return self.name
+
 
 class Tax(models.Model):
     name = models.CharField(max_length=32)
     rate = models.DecimalField(max_digits=3, decimal_places=2)
+
+    def __unicode__(self):
+        return self.name
 
 
 class Product(models.Model):
@@ -21,3 +27,5 @@ class Product(models.Model):
     service = models.BooleanField()
     pkwiu = models.CharField(max_length=16, null=True, blank=True)
 
+    def __unicode__(self):
+        return self.name

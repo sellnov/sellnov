@@ -6,4 +6,6 @@ class PaymentType(models.Model):
     transfer = models.BooleanField()
     due_days = models.PositiveIntegerField(null=True, blank=True)
 
+    def __unicode__(self):
+        return self.name
 

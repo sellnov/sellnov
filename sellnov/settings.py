@@ -1,4 +1,5 @@
 # Django settings for sellnov project.
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -6,6 +7,8 @@ TEMPLATE_DEBUG = DEBUG
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
+
+PROJECT_DIR = os.path.join(os.path.dirname(__file__))
 
 MANAGERS = ADMINS
 
@@ -33,7 +36,7 @@ TIME_ZONE = 'America/Chicago'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pl'
 
 SITE_ID = 1
 
@@ -44,6 +47,8 @@ USE_I18N = True
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale.
 USE_L10N = True
+
+USE_THOUSAND_SEPARATOR = True
 
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
@@ -108,9 +113,7 @@ ROOT_URLCONF = 'sellnov.urls'
 WSGI_APPLICATION = 'sellnov.wsgi.application'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+        os.path.join(PROJECT_DIR, 'templates'),
 )
 
 INSTALLED_APPS = (
@@ -120,6 +123,8 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.admin',
+    'sellnov',
     'customers',
     'userprofile',
     'stock',
@@ -159,3 +164,7 @@ LOGGING = {
         },
     }
 }
+
+FONT_DIR = os.path.join(PROJECT_DIR, 'fonts')
+
+DATE_FORMAT = 'Y-m-d'
