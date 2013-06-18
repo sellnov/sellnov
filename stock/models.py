@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 from django.db import models
 
 
@@ -7,6 +9,10 @@ class Unit(models.Model):
     def __unicode__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Jednostka miary'
+        verbose_name_plural = 'Jednostki miary'
+
 
 class Tax(models.Model):
     name = models.CharField(max_length=32)
@@ -14,6 +20,10 @@ class Tax(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    class Meta:
+        verbose_name = 'Stawka VAT'
+        verbose_name_plural = 'Stawki VAT'
 
 
 class Product(models.Model):
@@ -29,3 +39,7 @@ class Product(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    class Meta:
+        verbose_name = u'Towar/usługa'
+        verbose_name_plural = u'Towary/usługi'

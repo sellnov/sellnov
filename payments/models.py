@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 from django.db import models
 
 
@@ -9,3 +11,6 @@ class PaymentType(models.Model):
     def __unicode__(self):
         return self.name
 
+    class Meta:
+        verbose_name = u'Sposób płatności'
+        verbose_name_plural = u'Sposoby płatności'

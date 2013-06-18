@@ -5,19 +5,23 @@ from django.db.models import Sum
 
 
 class SaleInvoice(models.Model):
-    customer = models.ForeignKey('customers.Customer')
-    seller = models.ForeignKey('userprofile.BusinessEntity')
-    sell_date = models.DateField()
-    issue_date = models.DateField()
-    pay_date = models.DateField()
-    location = models.CharField(max_length=128)
-    number = models.PositiveIntegerField()
-    number_fmt = models.CharField(max_length=32)
-    payment_type = models.ForeignKey('payments.PaymentType')
-    payment_name = models.CharField(max_length=128)
-    comment = models.TextField(null=True, blank=True)
-    issuer_name = models.CharField(max_length=128, blank=True, default='')
-    paid = models.BooleanField(default=False)
+    customer = models.ForeignKey('customers.Customer', verbose_name='Klient')
+    seller = models.ForeignKey('userprofile.BusinessEntity', verbose_name='Sprzedawca')
+    sell_date = models.DateField(u'Data sprzedaży')
+    issue_date = models.DateField(u'Data wystawienia')
+    pay_date = models.DateField(u'Termin płatności')
+    location = models.CharField(u'Miejsce wystawienia', max_length=128)
+    number = models.PositiveIntegerField('Numer')
+    number_fmt = models.CharField(u'Numer wyświetlany', max_length=32)
+    payment_type = models.ForeignKey('payments.PaymentType', verbose_name=u'Sposób płatności')
+    payment_name = models.CharField(u'Nazwa płatności', max_length=128)
+    comment = models.TextField('Komentarz', null=True, blank=True)
+    issuer_name = models.CharField(u'Osoba wystawiająca', max_length=128, blank=True, default='')
+    paid = models.BooleanField(u'Zapłacona', default=False)
+
+    class Meta:
+        verbose_name = 'Faktura sprzedaży'
+        verbose_name_plural = 'Faktury sprzedaży'
 
     def __unicode__(self):
         return self.number_fmt

@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 from django.db import models
 
 # Create your models here.
@@ -19,6 +21,10 @@ class BusinessEntity(models.Model):
 
     owner = models.ForeignKey('auth.User')
     employers = models.ManyToManyField('auth.User', related_name='works_in')
+
+    class Meta:
+        verbose_name = 'Podmiot gospodarczy'
+        verbose_name_plural = 'Podmioty gospodarcze'
 
     def __unicode__(self):
         return self.name
