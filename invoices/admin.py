@@ -10,7 +10,9 @@ __maintainer__ = "Marcin Nowak"
 __email__ = "marcin.j.nowak@gmail.com"
 
 from django.contrib import admin
+from django.conf.urls.defaults import patterns, url
 from django.db.models import Sum
+from django.http import HttpResponse
 from django import forms
 from models import SaleInvoice, SaleInvoiceLine
 
@@ -141,6 +143,23 @@ class SaleInvoiceAdmin(admin.ModelAdmin):
 
     def total_vat(self, obj):
         return obj.saleinvoiceline_set.aggregate(Sum('tax_value'))['tax_value__sum']
+
+    def print_document(self, request, object_id):
+        invoice = self.get_object(request, object_id)
+        pdf = invoice.as_pdf({'copy': request.GET.get('copy')})
+        resp = HttpResponse(content=pdf.read(), content_type='application/pdf')
+        resp['Content-Disposition']='filename=FakturaVAT_%s.pdf' % invoice.number_fmt
+        return resp
+
+    def get_urls(self):
+        urls = super(SaleInvoiceAdmin, self).get_urls()
+        my_urls = patterns('',
+            url(r'^(.+)/print/$',
+                admin.site.admin_view(self.print_document),
+                name='saleinvoice_print'),
+            )
+        return my_urls + urls
+
 
 
 admin.site.register(SaleInvoice, SaleInvoiceAdmin)

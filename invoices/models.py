@@ -39,9 +39,10 @@ class SaleInvoice(models.Model):
     def currency(self):
         return u'zł'
 
-    def as_pdf(self):
+    def as_pdf(self, extra_context=None):
         import sellnov.pdf
-        return sellnov.pdf.create_pdf(self, 'rml/sale_invoice.rml')
+        return sellnov.pdf.create_pdf(self, 'rml/sale_invoice.rml',
+                extra_context=extra_context)
 
     def total_tax_value(self):
         try:

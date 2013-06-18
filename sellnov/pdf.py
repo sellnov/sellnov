@@ -14,11 +14,12 @@ from django.conf import settings
 from z3c.rml import rml2pdf
 
 
-def create_pdf(obj, template_name):
-    ctx = {
+def create_pdf(obj, template_name, extra_context=None):
+    ctx = extra_context or {}
+    ctx.update({
             'object': obj,
             'fontdir': settings.FONT_DIR,
-            }
+            })
     rml = render_to_string(template_name, ctx)
     return rml2pdf.parseString(rml)
 
