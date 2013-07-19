@@ -3,3 +3,4 @@
 /.env
 /sellnov-client/ext
 /sellnov-client/resources
+*.swp
