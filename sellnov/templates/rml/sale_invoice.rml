@@ -348,5 +348,12 @@
         </blockTable>
         <nextFrame/>
         <para style="Footer">Wygenerowano za pomocą programu Sellnov - Faktury Online v0.1 NTSmedia Marcin Nowak</para>
+    {% if object.comment %}
+        <nextFrame/>
+        <pageBreak/>
+        <para style="H1">Uwagi:</para>
+        <para style="FrameBody">{{ object.comment|linebreaks }}</para>
+    {% endif %}
     </story>
+
 </document>
