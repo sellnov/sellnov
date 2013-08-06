@@ -14,10 +14,11 @@ from django.conf.urls.defaults import patterns, url
 from django.db.models import Sum
 from django.http import HttpResponse
 from django import forms
-from models import SaleInvoice, SaleInvoiceLine
+from models import SaleInvoice, PurchaseInvoice
+from documents.models import Line
 
 
-class SaleInvoiceLineForm(forms.ModelForm):
+class LineForm(forms.ModelForm):
     price_gross = forms.DecimalField(label='Cena brutto', required=False,
             widget=forms.TextInput(attrs={'size': 8, 'disabled': True}))
     price_net = forms.DecimalField(label='Cena netto', required=False,
@@ -38,23 +39,23 @@ class SaleInvoiceLineForm(forms.ModelForm):
             widget=forms.TextInput(attrs={'size': 5}))
 
     class Meta:
-        model = SaleInvoiceLine
+        model = Line
         fields = ('product', 'product_name', 'pkwiu', 'unit_name', 'unit',
                 'price_net', 'quantity', 'tax', 'tax_rate', 'tax_value',
                 'price_gross', 'total_net', 'total_gross')
 
     def clean(self):
-        data = super(SaleInvoiceLineForm, self).clean()
+        data = super(LineForm, self).clean()
 
         value = data['product_name']
-        if not value and 'product' in data:
+        if not value and data.get('product'):
             value = data['product'].name
         if not value:
             raise forms.ValidationError('Required')
         data['product_name'] = value
 
         value = data['price_net']
-        if not value and 'product' in data:
+        if not value and data.get('product'):
             value = data['product'].price_net
         if not value:
             raise forms.ValidationError('Required')
@@ -62,32 +63,32 @@ class SaleInvoiceLineForm(forms.ModelForm):
 
 
         value = data['pkwiu']
-        if not value and 'product' in data:
+        if not value and data.get('product'):
             value = data['product'].pkwiu
         data['pkwiu'] = value
 
         value = data['unit']
-        if not value and 'product' in data:
+        if not value and data.get('product'):
             value = data['product'].unit
         if not value:
             raise forms.ValidationError('Required')
         data['unit'] = value
 
         value = data['unit'].name
-        if not value and 'product' in data:
+        if not value and data.get('product'):
             value = data['product'].unit.name
         if not value:
             raise forms.ValidationError('Required unit')
         data['unit_name'] = value
 
         value = data['tax']
-        if not value and 'product' in data:
+        if not value and data.get('product'):
             value = data['product'].tax
         data['tax'] = value
 
         if 'tax' in data:
             value = data['tax'].rate
-        elif 'product' in data:
+        elif data.get('product'):
             value = data['product'].tax.rate
         if value is None:
             raise forms.ValidationError('Required tax rate')
@@ -114,9 +115,9 @@ class SaleInvoiceLineForm(forms.ModelForm):
         return data
 
 
-class SaleInvoiceLineAdmin(admin.TabularInline):
-    model = SaleInvoiceLine
-    form = SaleInvoiceLineForm
+class LineAdmin(admin.TabularInline):
+    model = Line
+    form = LineForm
     fields = ('product', 'product_name', 'pkwiu', 'unit', 'unit_name',
             'price_net', 'quantity', 'tax', 'tax_rate', 'price_gross',
             'total_net', 'tax_value', 'total_gross',)
@@ -127,22 +128,22 @@ class SaleInvoiceLineAdmin(admin.TabularInline):
         elif db_field.name in ('pkwiu', 'price_net', 'price_gross',
                 'total_net', 'total_gross', 'quantity', 'tax_value'):
             kwargs['widget'] = forms.TextInput(attrs={'size': 10})
-        return super(SaleInvoiceLineAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+        return super(LineAdmin, self).formfield_for_dbfield(db_field, **kwargs)
 
 
-class SaleInvoiceAdmin(admin.ModelAdmin):
-    inlines = [SaleInvoiceLineAdmin]
+class DocumentAdmin(admin.ModelAdmin):
+    inlines = [LineAdmin]
     list_display = ['number_fmt', 'customer', 'total_net', 'total_vat',
-            'total_gross', 'sell_date', 'issue_date', 'pay_date', 'paid']
+            'total_gross', 'operation_date', 'issue_date', 'pay_date', 'paid']
 
     def total_net(self, obj):
-        return obj.saleinvoiceline_set.aggregate(Sum('total_net'))['total_net__sum']
+        return obj.line_set.aggregate(Sum('total_net'))['total_net__sum']
 
     def total_gross(self, obj):
-        return obj.saleinvoiceline_set.aggregate(Sum('total_gross'))['total_gross__sum']
+        return obj.line_set.aggregate(Sum('total_gross'))['total_gross__sum']
 
     def total_vat(self, obj):
-        return obj.saleinvoiceline_set.aggregate(Sum('tax_value'))['tax_value__sum']
+        return obj.line_set.aggregate(Sum('tax_value'))['tax_value__sum']
 
     def print_document(self, request, object_id):
         invoice = self.get_object(request, object_id)
@@ -152,16 +153,28 @@ class SaleInvoiceAdmin(admin.ModelAdmin):
         return resp
 
     def get_urls(self):
-        urls = super(SaleInvoiceAdmin, self).get_urls()
+        urls = super(DocumentAdmin, self).get_urls()
         my_urls = patterns('',
             url(r'^(.+)/print/$',
                 admin.site.admin_view(self.print_document),
-                name='saleinvoice_print'),
+                name='document_print'),
             )
         return my_urls + urls
 
+    def queryset(self, request):
+        return super(DocumentAdmin, self).queryset(request).filter(
+                doctype=self.model._meta.module_name)
+
+
+class SaleInvoiceAdmin(DocumentAdmin):
+    pass
+
+
+class PurchaseInvoiceAdmin(DocumentAdmin):
+    pass
 
 
 admin.site.register(SaleInvoice, SaleInvoiceAdmin)
+admin.site.register(PurchaseInvoice, PurchaseInvoiceAdmin)
 
 

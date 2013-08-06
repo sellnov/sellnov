@@ -104,7 +104,7 @@
                     </td></tr></blockTable>
                     <blockTable style="Frame"><tr><td>
                                 <para style="FrameHeader">Data sprzedaży:</para>
-                                <para style="FrameBodySmall">{{ object.sell_date|date }}</para>
+                                <para style="FrameBodySmall">{{ object.operation_date|date }}</para>
                     </td></tr></blockTable>
                     <blockTable style="Frame"><tr><td>
                                 <para style="FrameHeader">Data wystawienia:</para>
@@ -134,9 +134,9 @@
                                     <h3 style="H3">Nabywca</h3>
                                 </para>
                                 <para style="FrameBody">
-                                    {{ object.customer.name }}<br />
-                                    {{ object.customer.address }}, {{ object.customer.postal_code }} {{ object.customer.city }}<br />
-                                    NIP: {{ object.customer.nip }}
+                                    {{ object.buyer.name }}<br />
+                                    {{ object.buyer.address }}, {{ object.buyer.postal_code }} {{ object.buyer.city }}<br />
+                                    NIP: {{ object.buyer.nip }}
                                 </para>
                     </td></tr></blockTable>
                 </td>
@@ -352,7 +352,7 @@
         <nextFrame/>
         <pageBreak/>
         <para style="H1">Uwagi:</para>
-        <para style="FrameBody">{{ object.comment|linebreaks }}</para>
+        <para style="FrameBody">{{ object.comment|linebreaksbr }}</para>
     {% endif %}
     </story>
 

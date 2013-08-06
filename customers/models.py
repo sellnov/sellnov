@@ -2,6 +2,11 @@
 
 from django.db import models
 
+CUSTOMER_TYPE_CHOICES = (
+       (0, 'Dostawca/Odbiorca'),
+       (1, 'Dostawca'),
+       (2, 'Odbiorca'),
+)
 
 class Customer(models.Model):
     owner = models.ForeignKey('userprofile.BusinessEntity')
@@ -14,6 +19,7 @@ class Customer(models.Model):
     phone = models.CharField(max_length=64, null=True, blank=True)
     email = models.EmailField(max_length=255, null=True, blank=True)
     www = models.URLField(max_length=255, null=True, blank=True)
+    custtype = models.IntegerField(choices=CUSTOMER_TYPE_CHOICES)
 
     def __unicode__(self):
         return self.name
