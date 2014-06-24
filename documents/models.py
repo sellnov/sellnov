@@ -34,7 +34,7 @@ class Document(models.Model):
         return 0 if not self.paid else self.total_gross()
 
     def pay_date_days(self):
-        return (self.pay_date-self.sell_date).days
+        return (self.pay_date-self.issue_date).days
 
     @property
     def currency(self):

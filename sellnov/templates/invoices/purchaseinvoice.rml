@@ -178,7 +178,7 @@
                     <para style="P9">Wartość brutto</para>
                 </td>
             </tr>
-            {% for item in object.saleinvoiceline_set.all %}
+            {% for item in object.line_set.all %}
             <tr>
                 <td>
                     <para style="P7">{{ forloop.counter }}</para>
