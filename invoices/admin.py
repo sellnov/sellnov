@@ -10,7 +10,7 @@ __maintainer__ = "Marcin Nowak"
 __email__ = "marcin.j.nowak@gmail.com"
 
 from django.contrib import admin
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 from django.db.models import Sum
 from django.http import HttpResponse
 from django import forms
