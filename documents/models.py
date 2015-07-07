@@ -76,7 +76,7 @@ class Document(models.Model):
         return ''
 
     def save(self, *args, **kw):
-        self.doctype = self._meta.module_name
+        self.doctype = self._meta.model_name
         return super(Document, self).save(*args, **kw)
 
 
