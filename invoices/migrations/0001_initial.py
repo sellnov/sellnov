@@ -7,6 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('customers', '__first__'),
         ('documents', '__first__'),
     ]
 
