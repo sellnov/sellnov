@@ -95,7 +95,7 @@ class LineForm(forms.ModelForm):
 
         data['tax_rate'] = value
 
-        data['tax_value'] = data['price_net']*data['tax_rate']
+        data['tax_value'] = data['price_net']*data['tax_rate']*data['quantity']
 
         value = data['price_gross']
         if not value and 'price_net' in data and 'tax_rate' in data:
