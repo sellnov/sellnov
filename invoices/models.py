@@ -19,8 +19,8 @@ class SaleInvoice(Document):
 
     class Meta:
         proxy = True
-        verbose_name = 'Faktura sprzedaży'
-        verbose_name_plural = 'Faktury sprzedaży'
+        verbose_name = u'Faktura sprzedaży'
+        verbose_name_plural = u'Faktury sprzedaży'
 
 
 class PurchaseInvoice(Document):
@@ -41,6 +41,29 @@ class PurchaseInvoice(Document):
         proxy = True
         verbose_name = 'Faktura zakupu'
         verbose_name_plural = 'Faktury zakupu'
+
+
+class SaleReceipt(Document):
+    """
+    Paragon sprzedaz
+    """
+    @property
+    def sell_date(self):
+        return self.operation_date
+
+    @property
+    def seller(self):
+        return self.owner
+
+    @property
+    def buyer(self):
+        return self.customer
+
+
+    class Meta:
+        proxy = True
+        verbose_name = 'Paragon'
+        verbose_name_plural = 'Paragony'
 
 
 

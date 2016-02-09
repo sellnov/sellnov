@@ -14,7 +14,7 @@ from django.conf.urls import patterns, url
 from django.db.models import Sum
 from django.http import HttpResponse
 from django import forms
-from models import SaleInvoice, PurchaseInvoice
+from models import SaleInvoice, PurchaseInvoice, SaleReceipt
 from documents.models import Line
 
 
@@ -149,7 +149,8 @@ class DocumentAdmin(admin.ModelAdmin):
         invoice = self.get_object(request, object_id)
         pdf = invoice.as_pdf({'copy': request.GET.get('copy')})
         resp = HttpResponse(content=pdf.read(), content_type='application/pdf')
-        resp['Content-Disposition']='filename=FakturaVAT_%s.pdf' % invoice.number_fmt
+        resp['Content-Disposition']='filename=%s_%s.pdf' % (invoice._meta.verbose_name,
+                invoice.number_fmt)
         return resp
 
     def get_urls(self):
@@ -161,9 +162,9 @@ class DocumentAdmin(admin.ModelAdmin):
             )
         return my_urls + urls
 
-    def queryset(self, request):
-        return super(DocumentAdmin, self).queryset(request).filter(
-                doctype=self.model._meta.module_name)
+    def get_queryset(self, request):
+        return super(DocumentAdmin, self).get_queryset(request).filter(
+                doctype=self.model._meta.model_name)
 
 
 class SaleInvoiceAdmin(DocumentAdmin):
@@ -174,7 +175,12 @@ class PurchaseInvoiceAdmin(DocumentAdmin):
     pass
 
 
+class SaleReceiptAdmin(DocumentAdmin):
+    pass
+
+
 admin.site.register(SaleInvoice, SaleInvoiceAdmin)
 admin.site.register(PurchaseInvoice, PurchaseInvoiceAdmin)
+admin.site.register(SaleReceipt, SaleReceiptAdmin)
 
 
