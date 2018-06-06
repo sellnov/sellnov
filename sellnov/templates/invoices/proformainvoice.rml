@@ -95,7 +95,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    <para style="Title" fontName="SansBold">Faktura VAT {{ object.number_fmt }}<br/>{% if copy %}KOPIA{% else %}ORYGINAŁ{% endif %}</para>
+                    <para style="Title" fontName="SansBold">Faktura pro-forma {{ object.number_fmt }}<br/>{% if copy %}KOPIA{% else %}ORYGINAŁ{% endif %}</para>
                 </td>
                 <td>
                     <blockTable style="Frame"><tr><td>

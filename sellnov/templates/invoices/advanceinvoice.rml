@@ -25,6 +25,7 @@
         <paraStyle name="FrameBodySmall" parent="P2" alignment="CENTER" leading="21" />
         <paraStyle name="FrameBody" parent="P2" alignment="LEFT" leading="14" />
         <paraStyle name="H1" fontName="SansBold" fontSize="14" leading="16" spaceAfter="0.1cm"/>
+        <paraStyle name="H2" fontName="SansBold" fontSize="12" leading="14" spaceAfter="0.1cm"/>
         <paraStyle name="Title" parent="H1" alignment="CENTER" />
         <paraStyle name="H3" fontName="SansBold" fontSize="10" leading="12" spaceAfter="0.1cm"/>
         <paraStyle name="P9" fontName="Sans" fontSize="6" leading="7" alignment="CENTER"/>
@@ -68,12 +69,28 @@
             <blockSpan start="0,-1" stop="5,-1" doc:example="" />
         </blockTableStyle>
 
+        <blockTableStyle id="ProductsAdvancePayment">
+            <blockAlignment value="LEFT"/>
+            <blockValign value="MIDDLE"/>
+            <lineStyle kind="GRID" colorName="#000000" start="0,0" stop="-1,-2" thickness="0.01cm"/>
+            <lineStyle kind="GRID" colorName="#000000" start="2,-1" stop="-1,-1" thickness="0.01cm" />
+            <blockBackground colorName="#eaeaea" start="0,0" stop="-1,0" />
+            <blockSpan start="0,-1" stop="1,-1" doc:example="" />
+        </blockTableStyle>
+
         <blockTableStyle id="TaxInfo">
             <blockAlignment value="LEFT"/>
             <blockValign value="MIDDLE"/>
             <lineStyle kind="GRID" colorName="#000000" start="6,0" stop="-1,-1" thickness="0.01cm"/>
             <blockBackground colorName="#eaeaea" start="6,0" stop="-1,0" thickness="0.01cm" />
             <blockSpan start="0,0" stop="5,0" doc:example="" />
+        </blockTableStyle>
+
+        <blockTableStyle id="AdvancedPaymentTaxInfo">
+            <blockAlignment value="LEFT"/>
+            <blockValign value="MIDDLE"/>
+            <lineStyle kind="GRID" colorName="#000000" start="1,0" stop="-1,-1" thickness="0.01cm"/>
+            <blockBackground colorName="#eaeaea" start="1,0" stop="-1,0" thickness="0.01cm" />
         </blockTableStyle>
     </stylesheet>
 
@@ -95,7 +112,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    <para style="Title" fontName="SansBold">Faktura VAT {{ object.number_fmt }}<br/>{% if copy %}KOPIA{% else %}ORYGINAŁ{% endif %}</para>
+                    <para style="Title" fontName="SansBold">Faktura zaliczkowa {{ object.number_fmt }}<br/>{% if copy %}KOPIA{% else %}ORYGINAŁ{% endif %}</para>
                 </td>
                 <td>
                     <blockTable style="Frame"><tr><td>
@@ -103,7 +120,7 @@
                                 <para style="FrameBodySmall">{{ object.issue_city }}</para>
                     </td></tr></blockTable>
                     <blockTable style="Frame"><tr><td>
-                                <para style="FrameHeader">Data sprzedaży:</para>
+                                <para style="FrameHeader">Data wpłaty:</para>
                                 <para style="FrameBodySmall">{{ object.operation_date|date }}</para>
                     </td></tr></blockTable>
                     <blockTable style="Frame"><tr><td>
@@ -145,7 +162,145 @@
 
         <spacer length="1cm"/>
 
-        <blockTable colWidths="22.0,196.0,35.0,21.0,26.0,49.0,41.0,41.0,40.0,39.0" style="Products">
+        <blockTable colWidths="22.0,344.0,50.0,30.0,30.0,50.0" style="ProductsAdvancePayment">
+            <tr>
+                <td>
+                    <para style="P9">Lp.</para>
+                </td>
+                <td>
+                    <para style="P9">Nazwa produktu, towaru lub usługi</para>
+                </td>
+                <td>
+                    <para style="P9">Zaliczka netto</para>
+                </td>
+                <td>
+                    <para style="P9">Stawka VAT</para>
+                </td>
+                <td>
+                    <para style="P9">Kwota VAT</para>
+                </td>
+                <td>
+                    <para style="P9">Zaliczka brutto</para>
+                </td>
+            </tr>
+            {% for item in object.lines_ordered %}
+            <tr>
+                <td>
+                    <para style="P7">{{ forloop.counter }}</para>
+                </td>
+                <td>
+                    <para style="P6">{{ item.product_name }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ item.advance_payment_net }}</para>
+                </td>
+                <td>
+                    <para style="P7" alignment="CENTER">{{ item.tax_rate_prc }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ item.advance_payment_tax_value }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ item.advance_payment_gross }}</para>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td><para style="P8">Razem:</para></td>
+                <td></td>
+                <td>
+                    <para style="P7">{{ object.total_advance_payment_net }}</para>
+                </td>
+                <td>X</td>
+                <td>
+                    <para style="P7">{{ object.total_advance_payment_tax_value }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ object.total_advance_payment_gross }}</para>
+                </td>
+            </tr>
+        </blockTable>
+
+        <spacer length="0.25cm" />
+
+        <blockTable colWidths="366,50,30,30,50" style="AdvancedPaymentTaxInfo">
+            <tr>
+                <td>
+                    <para style="P8">W tym:</para>
+                </td>
+                <td>
+                    <para style="P9">Zaliczka netto</para>
+                </td>
+                <td>
+                    <para style="P9">Stawka VAT</para>
+                </td>
+                <td>
+                    <para style="P9">Kwota VAT</para>
+                </td>
+                <td>
+                    <para style="P9">Zaliczka brutto</para>
+                </td>
+            </tr>
+            {% for s in object.advance_payment_tax_summary %}
+            <tr>
+                <td></td>
+                <td><para style="P7">{{ s.total_net }}</para></td>
+                <td><para style="P7">{{ s.tax__name }}</para></td>
+                <td><para style="P7">{{ s.tax_value }}</para></td>
+                <td><para style="P7">{{ s.total_gross }}</para></td>
+            </tr>
+            {% endfor %}
+        </blockTable>
+
+        <spacer length="1cm"/>
+
+        <para style="P1">
+            Zapłacono: {{ object.total_advance_payment_gross }} {{ object.currency }} (słownie: {{ object.total_advance_payment_gross|as_words }} {{ object.currency }})<br />
+            Pozostało do zapłaty: {{ object.total_advance_payment_unpaid_gross }} {{ object.currency }}<br />
+            Sposób płatności: {{ object.payment_type.name }}
+            {% if object.payment_type.transfer %}, nr rachunku: {{ object.seller.iban }}{% endif %}
+        </para>
+
+        <spacer length="1cm"/>
+
+        <blockTable colWidths="40%,20%,40%">
+            <tr>
+                <td>
+                    <blockTable style="FrameBorder" rowHeights="20,3cm">
+                        <tr>
+                            <td>
+                                <para style="FrameHeader">Wystawił(a):</para>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td vAlign="TOP">
+                                <para style="FrameBodySmall">{{ object.issuer_full_name|default:" " }}</para>
+                            </td>
+                        </tr>
+                    </blockTable>
+                </td>
+                <td></td>
+                <td>
+                    <blockTable style="FrameBorder" rowHeights="20,3cm">
+                        <tr>
+                            <td>
+                                <para style="FrameHeader">Odebrał(a):</para>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td vAlign="TOP">
+                                <para style="FrameBodySmall">{{ object.receiver_full_name|default:" " }}</para>
+                            </td>
+                        </tr>
+                    </blockTable>
+                </td>
+            </tr>
+        </blockTable>
+
+        <spacer length="1cm"/>
+
+        <para style="H2">Zamówienie</para>
+        <blockTable colWidths="22.0,218.0,35.0,21.0,26.0,49.0,41.0,41.0,40.0,39.0" style="Products" alignment="left">
             <tr>
                 <td>
                     <para style="P9">Lp.</para>
@@ -231,128 +386,6 @@
                 </td>
             </tr>
         </blockTable>
-        <spacer length="5mm"/>
-        <blockTable colWidths="42.0,176.0,35.0,21.0,16.0,10,90.0,41.0,40.0,39.0" style="TaxInfo">
-            <tr><td><para style="P8">W tym:</para></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>
-                    <para style="P9">Stawka VAT</para>
-                </td>
-                <td>
-                    <para style="P9">Wartość netto</para>
-                </td>
-                <td>
-                    <para style="P9">Kwota VAT</para>
-                </td>
-                <td>
-                    <para style="P9">Wartość brutto</para>
-                </td>
-            </tr>
-            {% for s in object.tax_summary %}
-            <tr>
-                <td><para style="P8"></para></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>
-                    <para style="P7">{{ s.tax__name }}</para>
-                </td>
-                <td>
-                    <para style="P7">{{ s.total_net }}</para>
-                </td>
-                <td>
-                    <para style="P7">{{ s.tax_value }}</para>
-                </td>
-                <td>
-                    <para style="P7">{{ s.total_gross}}</para>
-                </td>
-            </tr>
-            {% endfor %}
-        </blockTable>
-
-        <spacer length="0.5cm" />
-
-        <blockTable colWidths="30%,70%">
-            <tr>
-                <td></td>
-                <td>
-                    <blockTable style="Frame">
-                        <tr>
-                            <td>
-                                <para style="FrameHeader" alignment="LEFT" fontSize="16" leading="24">
-                                    Do zapłaty: {{ object.total_gross }} {{ object.currency }}
-                                </para>
-                                <para style="FrameBodySmall" alignment="LEFT" spaceBefore="0.2cm">
-                                    Słownie: {{ object.total_gross|as_words }}
-                                </para>
-                            </td>
-                        </tr>
-                    </blockTable>
-                </td>
-            </tr>           
-        </blockTable>
-
-        <spacer length="1cm"/>
-
-        {% if object.paid %}
-        <para style="P1">Zapłacono: {{ object.total_paid }} {{ object.currency }}</para>
-        {% else %}  
-        <para style="P1">
-            Do zapłaty: {{ object.total_unpaid }} {{ object.currency }}<br />
-            Sposób płatności: {{ object.payment_type.name }}<br />
-            {% if object.pay_date %}Termin płatności: {{ object.pay_date|date }} ({{ object.pay_date_days }} dni)<br />{% endif %}
-            {% if object.payment_type.transfer %}Nr rachunku: {{ object.seller.iban }}{% endif %}
-        </para>
-        {% endif %}
-
-        <spacer length="1cm"/>
-
-        <blockTable colWidths="40%,20%,40%">
-            <tr>
-                <td>
-                    <blockTable style="FrameBorder" rowHeights="20,3cm">
-                        <tr>
-                            <td>
-                                <para style="FrameHeader">Wystawił(a):</para>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td vAlign="TOP">
-                                <para style="FrameBodySmall">{{ object.issuer_full_name|default:" " }}</para>
-                            </td>
-                        </tr>
-                    </blockTable>
-                </td>
-                <td></td>
-                <td>
-                    <blockTable style="FrameBorder" rowHeights="20,3cm">
-                        <tr>
-                            <td>
-                                <para style="FrameHeader">Odebrał(a):</para>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td vAlign="TOP">
-                                <para style="FrameBodySmall">{{ object.receiver_full_name|default:" " }}</para>
-                            </td>
-                        </tr>
-                    </blockTable>
-                </td>
-            </tr>
-        </blockTable>
         <nextFrame/>
-    {% if object.comment %}
-        <nextFrame/>
-        <pageBreak/>
-        <para style="H1">Uwagi:</para>
-        <para style="FrameBody">{{ object.comment|linebreaksbr }}</para>
-    {% endif %}
     </story>
-
 </document>

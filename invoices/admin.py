@@ -14,8 +14,12 @@ from django.conf.urls import patterns, url
 from django.db.models import Sum
 from django.http import HttpResponse
 from django import forms
-from models import SaleInvoice, PurchaseInvoice, SaleReceipt
+from models import (
+        SaleInvoice, PurchaseInvoice, SaleReceipt, ProFormaInvoice,
+        AdvanceInvoice)
+
 from documents.models import Line
+import filesanitize
 
 
 class LineForm(forms.ModelForm):
@@ -46,6 +50,11 @@ class LineForm(forms.ModelForm):
 
     def clean(self):
         data = super(LineForm, self).clean()
+
+        if self.instance:
+            old = type(self.instance).objects.get(pk=self.instance.pk)
+        else:
+            old = None
 
         value = data['product_name']
         if not value and data.get('product'):
@@ -112,20 +121,54 @@ class LineForm(forms.ModelForm):
             value = data['total_net']*(1+data['tax_rate'])
         data['total_gross'] = value
 
+        adv_net, adv_gross = data.get('advance_payment_net'), data.get('advance_payment_gross')
+
+        if adv_net or adv_gross:
+            if old:
+                if (not old.advance_payment_net == adv_net and
+                        old.advance_payment_gross == adv_gross):
+                    # zmienilo sie netto, wyliczamy brutto
+                    data['advance_payment_gross'] = adv_net*(1+data['tax_rate'])
+                elif (not old.advance_payment_gross == adv_gross and
+                        old.advance_payment_net == adv_net):
+                    # zmienilo sie brutto, wyliczamy netto
+                    data['advance_payment_net'] = adv_gross/(1+data['tax_rate'])
+                else:
+                    # liczymy zawsze od netto, bo nie ufamy userowi
+                    data['advance_payment_gross'] = adv_net*(1+data['tax_rate'])
+            else:
+                if adv_gross and not adv_net:
+                    # user podal brutto, wyliczamy netto
+                    data['advance_payment_net'] = adv_gross/(1+data['tax_rate'])
+                else:
+                    # user podal netto lub obie, wyliczamy brutto
+                    data['advance_payment_net'] = adv_gross/(1+data['tax_rate'])
+
         return data
+
+
+class AdvancePaymentLineForm(LineForm):
+    advance_payment_net = forms.DecimalField(
+            label=u'Zaliczka netto', required=False,
+            widget=forms.TextInput(attrs={'size': 5}))
+    advance_payment_gross = forms.DecimalField(
+            label=u'Zaliczka brutto', required=False,
+            widget=forms.TextInput(attrs={'size': 5}))
 
 
 class LineAdmin(admin.TabularInline):
     model = Line
     form = LineForm
-    fields = ('product', 'product_name', 'pkwiu', 'unit', 'unit_name',
+    fields = (
+            'product', 'product_name', 'pkwiu', 'unit', 'unit_name',
             'price_net', 'quantity', 'tax', 'tax_rate', 'price_gross',
             'total_net', 'tax_value', 'total_gross',)
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         if db_field.name == 'product_name':
             kwargs['widget'] = forms.Textarea(attrs={'rows': 4})
-        elif db_field.name in ('pkwiu', 'price_net', 'price_gross',
+        elif db_field.name in (
+                'pkwiu', 'price_net', 'price_gross',
                 'total_net', 'total_gross', 'quantity', 'tax_value'):
             kwargs['widget'] = forms.TextInput(attrs={'size': 10})
         return super(LineAdmin, self).formfield_for_dbfield(db_field, **kwargs)
@@ -133,7 +176,8 @@ class LineAdmin(admin.TabularInline):
 
 class DocumentAdmin(admin.ModelAdmin):
     inlines = [LineAdmin]
-    list_display = ['number_fmt', 'customer', 'total_net', 'total_vat',
+    list_display = [
+            'number_fmt', 'customer', 'total_net', 'total_vat',
             'total_gross', 'operation_date', 'issue_date', 'pay_date', 'paid']
 
     def total_net(self, obj):
@@ -148,9 +192,11 @@ class DocumentAdmin(admin.ModelAdmin):
     def print_document(self, request, object_id):
         invoice = self.get_object(request, object_id)
         pdf = invoice.as_pdf({'copy': request.GET.get('copy')})
+        copy = '_kopia' if request.GET.get('copy') else ''
+        filename = filesanitize.safe_path('%s_%s%s.pdf' % (
+            invoice._meta.verbose_name, invoice.number_fmt, copy))
         resp = HttpResponse(content=pdf.read(), content_type='application/pdf')
-        resp['Content-Disposition']='filename=%s_%s.pdf' % (invoice._meta.verbose_name,
-                invoice.number_fmt)
+        resp['Content-Disposition']='filename=%s' % filename
         return resp
 
     def get_urls(self):
@@ -167,6 +213,12 @@ class DocumentAdmin(admin.ModelAdmin):
                 doctype=self.model._meta.model_name)
 
 
+class AdvancePaymentLineAdmin(LineAdmin):
+    form = AdvancePaymentLineForm
+    fields = list(LineAdmin.fields)+[
+            'advance_payment_net', 'advance_payment_gross']
+
+
 class SaleInvoiceAdmin(DocumentAdmin):
     pass
 
@@ -179,8 +231,16 @@ class SaleReceiptAdmin(DocumentAdmin):
     pass
 
 
+class ProFormaInvoiceAdmin(DocumentAdmin):
+    pass
+
+
+class AdvanceInvoiceAdmin(DocumentAdmin):
+    inlines = [AdvancePaymentLineAdmin]
+
+
 admin.site.register(SaleInvoice, SaleInvoiceAdmin)
 admin.site.register(PurchaseInvoice, PurchaseInvoiceAdmin)
 admin.site.register(SaleReceipt, SaleReceiptAdmin)
-
-
+admin.site.register(ProFormaInvoice, ProFormaInvoiceAdmin)
+admin.site.register(AdvanceInvoice, AdvanceInvoiceAdmin)

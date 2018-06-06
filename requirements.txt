@@ -3,3 +3,6 @@ reportlab==2.7
 Pillow==2.8.2
 z3c.rml==2.1.0
 psycopg2==2.5
+filesanitize==1.0.1
+ipdb
+ipython
