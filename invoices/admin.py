@@ -23,35 +23,47 @@ import filesanitize
 
 
 class LineForm(forms.ModelForm):
-    price_gross = forms.DecimalField(label='Cena brutto', required=False,
+    price_gross = forms.DecimalField(
+            label='Cena brutto', required=False,
             widget=forms.TextInput(attrs={'size': 8, 'disabled': True}))
-    price_net = forms.DecimalField(label='Cena netto', required=False,
-            widget=forms.TextInput(attrs={'size': 8 }))
-    product_name = forms.CharField(label=u'Produkt/usługa', required=False,
+    price_net = forms.DecimalField(
+            label='Cena netto', required=False,
+            widget=forms.TextInput(
+                attrs={'size': 8}))
+    product_name = forms.CharField(
+            label=u'Produkt/usługa', required=False,
             widget=forms.Textarea(attrs={'cols': 20, 'rows': 4}))
-    unit_name = forms.CharField(label=u'Jedn.', required=False,
-            widget=forms.TextInput(attrs={'size': 4,'disabled': True}))
-    total_net = forms.DecimalField(label=u'Wart.netto', required=False,
+    unit_name = forms.CharField(
+            label=u'Jedn.', required=False,
+            widget=forms.TextInput(
+                attrs={'size': 4, 'disabled': True}))
+    total_net = forms.DecimalField(
+            label=u'Wart.netto', required=False,
             widget=forms.TextInput(attrs={'size': 10, 'disabled': True}))
-    total_gross = forms.DecimalField(label=u'Wart.brutto', required=False,
+    total_gross = forms.DecimalField(
+            label=u'Wart.brutto', required=False,
             widget=forms.TextInput(attrs={'size': 10, 'disabled': True}))
-    tax_value = forms.DecimalField(label=u'VAT', required=False,
+    tax_value = forms.DecimalField(
+            label=u'VAT', required=False,
             widget=forms.TextInput(attrs={'size': 5, 'disabled': True}))
-    tax_rate = forms.DecimalField(label=u'Stawka', required=False,
+    tax_rate = forms.DecimalField(
+            label=u'Stawka', required=False,
             widget=forms.TextInput(attrs={'size': 3, 'disabled': True}))
-    quantity = forms.DecimalField(label=u'Ilość', required=True,
+    quantity = forms.DecimalField(
+            label=u'Ilość', required=True,
             widget=forms.TextInput(attrs={'size': 5}))
 
     class Meta:
         model = Line
-        fields = ('product', 'product_name', 'pkwiu', 'unit_name', 'unit',
+        fields = (
+                'product', 'product_name', 'pkwiu', 'unit_name', 'unit',
                 'price_net', 'quantity', 'tax', 'tax_rate', 'tax_value',
                 'price_gross', 'total_net', 'total_gross')
 
     def clean(self):
         data = super(LineForm, self).clean()
 
-        if self.instance:
+        if self.instance and self.instance.pk:
             old = type(self.instance).objects.get(pk=self.instance.pk)
         else:
             old = None

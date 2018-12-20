@@ -297,6 +297,76 @@
             </tr>
         </blockTable>
 
+        {% with object.related_previous_documents_of_same_type as previous_list %}
+        {% if previous_list %}
+        <spacer length="1cm"/>
+        <para style="H2">Poprzednie zaliczki</para>
+        <blockTable colWidths="22.0,218.0,35.0,21.0,26.0,49.0,41.0,41.0,40.0,39.0" style="Products" alignment="left">
+            <tr>
+                <td>
+                    <para style="P9">Lp.</para>
+                </td>
+                <td>
+                    <para style="P9">Numer faktury</para>
+                </td>
+                <td>
+                    <para style="P9">Data</para>
+                </td>
+                <td>
+                    <para style="P9">Wartość netto</para>
+                </td>
+                <td>
+                    <para style="P9">Stawka VAT</para>
+                </td>
+                <td>
+                    <para style="P9">Wartość brutto</para>
+                </td>
+            </tr>
+            {% for item in previous_list %}
+            {% for prevsum in item.advance_payment_tax_summary %}
+            <tr>
+                <td>
+                    <para style="P7">{{ forloop.counter }}</para>
+                </td>
+                <td>
+                    <para style="P6">{{ item.number_fmt }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ item.issue_date|date }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ prevsum.total_net }}</para>
+                </td>
+                <td>
+                    <para style="P7" alignment="CENTER">{{ prevsum.tax__name }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ prevsum.tax_value }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ prevsum.total_gross }}</para>
+                </td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+            <tr>
+                <td><para style="P8">Razem:</para></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                    <para style="P7">{{ item.total_advance_payment_net }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ object.total_advance_payment_tax_value }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ object.total_advance_payment_gross }}</para>
+                </td>
+            </tr>
+        </blockTable>
+        {% endif %}
+        {% endwith %}
         <spacer length="1cm"/>
 
         <para style="H2">Zamówienie</para>

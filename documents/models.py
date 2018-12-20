@@ -119,7 +119,26 @@ class Document(models.Model):
         """
         Kwota pozostala do zaplaty
         """
-        return self.total_gross() - self.total_advance_payment_gross()
+        prev_paid = 0
+        for doc in self.related_documents_of_same_type():
+            prev_paid += doc.total_advance_payment_gross()
+        return (
+                self.total_gross() - self.total_advance_payment_gross()
+                - prev_paid)
+
+    def related_documents(self):
+        if self.parent:
+            return Document.objects.filter(
+                    parent=self.parent).exclude(pk=self.pk)
+        else:
+            return Document.objects.none()
+
+    def related_documents_of_same_type(self):
+        return self.related_documents().filter(doctype=self.doctype)
+
+    def related_previous_documents_of_same_type(self):
+        return self.related_documents().filter(
+                doctype=self.doctype, issue_date__lte=self.issue_date)
 
 
 class Line(models.Model):
