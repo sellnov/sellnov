@@ -29,9 +29,18 @@ class Migration(migrations.Migration):
                 ('issuer_name', models.CharField(default=b'', max_length=128, verbose_name='Osoba wystawiaj\u0105ca', blank=True)),
                 ('paid', models.BooleanField(default=False, verbose_name='Zap\u0142acona')),
                 ('doctype', models.CharField(max_length=32, editable=False)),
-                ('customer', models.ForeignKey(verbose_name=b'Klient', to='customers.Customer')),
-                ('owner', models.ForeignKey(verbose_name=b'Podmiot', to='userprofile.BusinessEntity')),
-                ('payment_type', models.ForeignKey(verbose_name='Spos\xf3b p\u0142atno\u015bci', to='payments.PaymentType')),
+                ('customer', models.ForeignKey(
+                    verbose_name=b'Klient', to='customers.Customer',
+                    on_delete=models.PROTECT,
+                    )),
+                ('owner', models.ForeignKey(
+                    verbose_name=b'Podmiot', to='userprofile.BusinessEntity',
+                    on_delete=models.PROTECT,
+                    )),
+                ('payment_type', models.ForeignKey(
+                    verbose_name='Spos\xf3b p\u0142atno\u015bci',
+                    to='payments.PaymentType',
+                    on_delete=models.PROTECT)),
             ],
         ),
         migrations.CreateModel(
@@ -49,10 +58,17 @@ class Migration(migrations.Migration):
                 ('total_gross', models.DecimalField(max_digits=22, decimal_places=2)),
                 ('pkwiu', models.CharField(max_length=16, null=True, blank=True)),
                 ('comment', models.TextField(null=True, blank=True)),
-                ('document', models.ForeignKey(to='documents.Document')),
-                ('product', models.ForeignKey(blank=True, to='stock.Product', null=True)),
-                ('tax', models.ForeignKey(blank=True, to='stock.Tax', null=True)),
-                ('unit', models.ForeignKey(blank=True, to='stock.Unit', null=True)),
+                ('document', models.ForeignKey(
+                    to='documents.Document', on_delete=models.CASCADE)),
+                ('product', models.ForeignKey(
+                    blank=True, to='stock.Product', null=True,
+                    on_delete=models.PROTECT)),
+                ('tax', models.ForeignKey(
+                    blank=True, to='stock.Tax', null=True,
+                    on_delete=models.PROTECT)),
+                ('unit', models.ForeignKey(
+                    blank=True, to='stock.Unit', null=True,
+                    on_delete=models.PROTECT)),
             ],
         ),
     ]

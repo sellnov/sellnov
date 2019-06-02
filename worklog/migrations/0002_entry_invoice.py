@@ -15,6 +15,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='entry',
             name='invoice',
-            field=models.ForeignKey(blank=True, to='invoices.SaleInvoice', null=True),
+            field=models.ForeignKey(
+                blank=True, to='invoices.SaleInvoice', null=True,
+                on_delete=models.SET_NULL),
         ),
     ]

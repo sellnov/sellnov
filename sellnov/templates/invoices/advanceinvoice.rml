@@ -3,7 +3,7 @@
 <document filename="{{ object.number }}" xmlns:doc="http://namespaces.zope.org/rml/doc">
 
     <docinit doc:example="">
-        <registerTTFont faceName="Fixed" fileName="Vera.ttf" doc:example="" />
+        <registerTTFont faceName="Fixed" fileName="{{ fontdir }}/Vera.ttf" doc:example="" />
         <registerTTFont faceName="Sans" fileName="{{ fontdir }}/LiberationSans-Regular.ttf" doc:example="" />
         <registerTTFont faceName="SansItalic" fileName="{{ fontdir }}/LiberationSans-Italic.ttf" doc:example="" />
         <registerTTFont faceName="SansBold" fileName="{{ fontdir }}/LiberationSans-Bold.ttf" doc:example="" />

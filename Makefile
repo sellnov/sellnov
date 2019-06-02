@@ -5,9 +5,9 @@ clear:
 	find . -name *.pyo -exec rm -f {} \;
 
 env-activate:
-	(source .env/bin/activate)
+	(source env/bin/activate)
 
 development : env-activate requirements.txt
 
 requirements.txt :
-	(source .env/bin/activate && pip install -r $@)
+	(source env/bin/activate && pip install -r $@)

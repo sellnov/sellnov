@@ -27,7 +27,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('manhour_cost', models.PositiveIntegerField()),
-                ('associate', models.ForeignKey(to='userprofile.Associate')),
+                ('associate', models.ForeignKey(
+                    to='userprofile.Associate',
+                    on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -41,7 +43,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='associaterolecosts',
             name='role',
-            field=models.ForeignKey(to='userprofile.Role'),
+            field=models.ForeignKey(
+                to='userprofile.Role', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='associate',

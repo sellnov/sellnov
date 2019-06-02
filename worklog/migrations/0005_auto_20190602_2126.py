@@ -34,8 +34,8 @@ class Migration(migrations.Migration):
                 ('min_hours', models.PositiveIntegerField()),
                 ('max_hours', models.PositiveIntegerField()),
                 ('notes', models.TextField(blank=True)),
-                ('role', models.ForeignKey(to='userprofile.Role')),
-                ('valuation', models.ForeignKey(to='worklog.Valuation')),
+                ('role', models.ForeignKey(to='userprofile.Role', on_delete=models.PROTECT)),
+                ('valuation', models.ForeignKey(to='worklog.Valuation', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AlterModelOptions(

@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.utils.translation import ugettext as _
-from models import Account, Operation, Transfer, TransferWithBalance, MonthlyTransferBalance
+from .models import (
+        Account, Operation, Transfer, TransferWithBalance,
+        MonthlyTransferBalance)
 import calendar
 
 

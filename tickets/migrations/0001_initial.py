@@ -58,6 +58,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='pricing',
             name='ticket',
-            field=models.ForeignKey(to='tickets.Ticket'),
+            field=models.ForeignKey(to='tickets.Ticket', on_delete=models.CASCADE),
         ),
     ]

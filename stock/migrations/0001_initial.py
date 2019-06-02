@@ -21,7 +21,8 @@ class Migration(migrations.Migration):
                 ('price_gross', models.DecimalField(max_digits=22, decimal_places=2)),
                 ('service', models.BooleanField()),
                 ('pkwiu', models.CharField(max_length=16, null=True, blank=True)),
-                ('owner', models.ForeignKey(to='userprofile.BusinessEntity')),
+                ('owner', models.ForeignKey(
+                    to='userprofile.BusinessEntity', on_delete=models.PROTECT)),
             ],
             options={
                 'verbose_name': 'Towar/us\u0142uga',
@@ -54,11 +55,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='product',
             name='tax',
-            field=models.ForeignKey(to='stock.Tax'),
+            field=models.ForeignKey(to='stock.Tax', on_delete=models.PROTECT),
         ),
         migrations.AddField(
             model_name='product',
             name='unit',
-            field=models.ForeignKey(to='stock.Unit'),
+            field=models.ForeignKey(to='stock.Unit', on_delete=models.PROTECT),
         ),
     ]

@@ -4,7 +4,7 @@ import datetime
 
 from django.contrib import admin
 from django.conf import settings
-from django.conf.urls import patterns, url
+from django.urls import path
 from django.db.models import Sum
 from django.http import HttpResponse
 from django import forms
@@ -72,13 +72,12 @@ class DocumentAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         urls = super(DocumentAdmin, self).get_urls()
-        my_urls = patterns(
-            '',
-            url(r'^(.+)/print/$',
-                admin.site.admin_view(self.print_document),
-                name='document_print'),
-            )
-        return my_urls + urls
+        my_urls = [
+            path(
+                '<int:object_id>/print/',
+                admin.site.admin_view(self.print_document))
+            ]
+        return list(my_urls) + urls
 
     def get_queryset(self, request):
         return super(DocumentAdmin, self).get_queryset(request).filter(

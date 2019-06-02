@@ -25,7 +25,9 @@ class Migration(migrations.Migration):
                 ('email', models.EmailField(max_length=255, null=True, blank=True)),
                 ('www', models.URLField(max_length=255, null=True, blank=True)),
                 ('custtype', models.IntegerField(choices=[(0, b'Dostawca/Odbiorca'), (1, b'Dostawca'), (2, b'Odbiorca')])),
-                ('owner', models.ForeignKey(to='userprofile.BusinessEntity')),
+                ('owner', models.ForeignKey(
+                    to='userprofile.BusinessEntity',
+                    on_delete=models.PROTECT)),
             ],
             options={
                 'verbose_name': 'Klient',

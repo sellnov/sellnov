@@ -1,9 +1,9 @@
-Django==1.8.2
-reportlab==2.7
-Pillow==2.8.2
-z3c.rml==2.1.0
-psycopg2==2.5
-filesanitize==1.0.1
+Django==2.2.1
+reportlab==3.5.23
+Pillow==6.0.0
+z3c.rml==3.6.3
+psycopg2-binary==2.8.2
+filesanitize==1.1.0
 ipdb
 ipython
 arrow

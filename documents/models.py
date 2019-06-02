@@ -41,10 +41,14 @@ class Document(models.Model):
 
     parent = models.ForeignKey(
             'self', null=True, blank=True,
-            verbose_name='Dokument powiązany (nadrzędny)')
-    customer = models.ForeignKey('customers.Customer', verbose_name='Klient')
+            verbose_name='Dokument powiązany (nadrzędny)',
+            on_delete=models.PROTECT)
+    customer = models.ForeignKey(
+            'customers.Customer', verbose_name='Klient',
+            on_delete=models.PROTECT)
     owner = models.ForeignKey(
-            'userprofile.BusinessEntity', verbose_name='Podmiot')
+            'userprofile.BusinessEntity', verbose_name='Podmiot',
+            on_delete=models.PROTECT)
     operation_date = models.DateField(u'Data czynności')
     issue_date = models.DateField(u'Data wystawienia')
     pay_date = models.DateField(u'Termin płatności')
@@ -52,7 +56,8 @@ class Document(models.Model):
     number = models.PositiveIntegerField('Numer')
     number_fmt = models.CharField(u'Numer wyświetlany', max_length=32)
     payment_type = models.ForeignKey(
-            'payments.PaymentType', verbose_name=u'Sposób płatności')
+            'payments.PaymentType', verbose_name=u'Sposób płatności',
+            on_delete=models.PROTECT)
     payment_name = models.CharField(u'Nazwa płatności', max_length=128)
     comment = models.TextField('Komentarz', null=True, blank=True)
     issuer_name = models.CharField(
@@ -61,7 +66,7 @@ class Document(models.Model):
     doctype = models.CharField(max_length=32, editable=False)
     objects = DocumentManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s %s' % (self.doctype, self.number_fmt)
 
     @property
@@ -189,10 +194,14 @@ class Document(models.Model):
 
 @six.python_2_unicode_compatible
 class Line(models.Model):
-    document = models.ForeignKey(Document)
-    product = models.ForeignKey('stock.Product', null=True, blank=True)
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
+    product = models.ForeignKey(
+            'stock.Product', null=True, blank=True,
+            on_delete=models.PROTECT)
     product_name = models.CharField(max_length=128)
-    unit = models.ForeignKey('stock.Unit', null=True, blank=True)
+    unit = models.ForeignKey(
+            'stock.Unit', null=True, blank=True,
+            on_delete=models.PROTECT)
     unit_name = models.CharField(max_length=32)
     price_net = models.DecimalField(max_digits=22, decimal_places=2)
     price_gross = models.DecimalField(max_digits=22, decimal_places=2)
@@ -203,12 +212,14 @@ class Line(models.Model):
             max_digits=22, decimal_places=2, default=0,
             verbose_name='Zaliczka brutto')
     quantity = models.DecimalField(max_digits=10, decimal_places=3)
-    tax = models.ForeignKey('stock.Tax', null=True, blank=True)
+    tax = models.ForeignKey(
+            'stock.Tax', null=True, blank=True,
+            on_delete=models.PROTECT)
     tax_rate = models.DecimalField(max_digits=3, decimal_places=2)
     tax_value = models.DecimalField(max_digits=22, decimal_places=2)
     total_net = models.DecimalField(max_digits=22, decimal_places=2)
     total_gross = models.DecimalField(max_digits=22, decimal_places=2)
-    pkwiu = models.CharField(max_length=16, null=True, blank=True)
+    pkwiu = models.CharField(max_length=16, null=False, blank=True)
     comment = models.TextField(null=True, blank=True)
 
     @property

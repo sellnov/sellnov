@@ -15,7 +15,7 @@ class Unit(models.Model):
     name = models.CharField(max_length=16)
     objects = UnitManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -33,7 +33,7 @@ class Tax(models.Model):
     rate = models.DecimalField(max_digits=3, decimal_places=2)
     objects = TaxManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -54,20 +54,22 @@ class Group(models.Model):
 
 
 class Product(models.Model):
-    owner = models.ForeignKey('userprofile.BusinessEntity')
+    owner = models.ForeignKey(
+            'userprofile.BusinessEntity', on_delete=models.PROTECT)
     code = models.CharField(max_length=32, null=True, blank=True, unique=True)
-    group = models.ForeignKey(Group, null=True, blank=True)
+    group = models.ForeignKey(
+            Group, null=True, blank=True, on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
     desc = models.TextField(null=True, blank=True)
     price_net = models.DecimalField(max_digits=22, decimal_places=2)
     price_gross = models.DecimalField(max_digits=22, decimal_places=2)
-    tax = models.ForeignKey('tax')
-    unit = models.ForeignKey('unit')
+    tax = models.ForeignKey('tax', on_delete=models.PROTECT)
+    unit = models.ForeignKey('unit', on_delete=models.PROTECT)
     service = models.BooleanField()
     pkwiu = models.CharField(max_length=16, null=True, blank=True)
     notes = models.CharField(max_length=255, null=False, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:

@@ -14,6 +14,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='document',
             name='parent',
-            field=models.ForeignKey(verbose_name=b'Dokument powi\xc4\x85zany (nadrz\xc4\x99dny)', blank=True, to='documents.Document', null=True),
+            field=models.ForeignKey(
+                verbose_name=b'Dokument powi\xc4\x85zany (nadrz\xc4\x99dny)',
+                blank=True, to='documents.Document', null=True,
+                on_delete=models.PROTECT),
         ),
     ]

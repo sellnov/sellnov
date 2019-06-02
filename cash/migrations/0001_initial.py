@@ -61,8 +61,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('amount', models.DecimalField(max_digits=10, decimal_places=2)),
-                ('account', models.ForeignKey(to='cash.Account')),
-                ('operation', models.ForeignKey(to='cash.Operation')),
+                ('account', models.ForeignKey(to='cash.Account', on_delete=models.DO_NOTHING)),
+                ('operation', models.ForeignKey(to='cash.Operation', on_delete=models.DO_NOTHING)),
             ],
         ),
     ]

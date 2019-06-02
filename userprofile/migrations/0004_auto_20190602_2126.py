@@ -44,7 +44,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='associaterolecosts',
             name='associate',
-            field=models.ForeignKey(verbose_name='wsp\xf3\u0142pracownik', to='userprofile.Associate'),
+            field=models.ForeignKey(
+                verbose_name='wsp\xf3\u0142pracownik',
+                to='userprofile.Associate',
+                on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='associaterolecosts',
@@ -54,7 +57,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='associaterolecosts',
             name='role',
-            field=models.ForeignKey(verbose_name=b'rola', to='userprofile.Role'),
+            field=models.ForeignKey(
+                verbose_name=b'rola', to='userprofile.Role',
+                on_delete=models.CASCADE,
+                ),
         ),
         migrations.AlterField(
             model_name='role',

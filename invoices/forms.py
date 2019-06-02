@@ -1,5 +1,6 @@
 # coding: utf-8
 
+from decimal import Decimal
 from django import forms
 from documents.models import Line
 from customers.models import Customer
@@ -45,7 +46,7 @@ class LineForm(forms.ModelForm):
                 'price_gross', 'total_net', 'total_gross')
 
     def clean(self):
-        data = super(LineForm, self).clean()
+        data = self.cleaned_data
 
         if self.instance and self.instance.pk:
             old = type(self.instance).objects.get(pk=self.instance.pk)
@@ -103,21 +104,26 @@ class LineForm(forms.ModelForm):
 
         data['tax_rate'] = value
 
-        data['tax_value'] = data['price_net']*data['tax_rate']*data['quantity']
+        data['tax_value'] = (
+            data['price_net']*data['tax_rate']*data['quantity']).quantize(
+                                                            Decimal('1.00'))
 
         value = data['price_gross']
         if not value and 'price_net' in data and 'tax_rate' in data:
-            value = data['price_net']*(1+data['tax_rate'])
+            value = (data['price_net']*(1+data['tax_rate'])).quantize(
+                    Decimal('1.00'))
         if not value:
             raise forms.ValidationError('Required')
         data['price_gross'] = value
 
         value = data['total_net']
-        data['total_net'] = data['price_net']*data['quantity']
+        data['total_net'] = (data['price_net']*data['quantity']).quantize(
+                Decimal('1.00'))
 
         value = data['total_gross']
         if 'tax_rate' in data:
-            value = data['total_net']*(1+data['tax_rate'])
+            value = (data['total_net']*(1+data['tax_rate'])).quantize(
+                    Decimal('1.00'))
         data['total_gross'] = value
 
         adv_net, adv_gross = (

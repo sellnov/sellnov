@@ -1,6 +1,7 @@
 *.pyc
 *.pyo
 /.env
+/env
 /sellnov-client/ext
 /sellnov-client/resources
 *.swp

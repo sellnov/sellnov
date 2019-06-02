@@ -15,7 +15,7 @@ class PaymentType(models.Model):
     due_days = models.PositiveIntegerField(null=True, blank=True)
     objects = PaymentTypeManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:

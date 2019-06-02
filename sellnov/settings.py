@@ -91,20 +91,30 @@ STATICFILES_FINDERS = (
 SECRET_KEY = '9@ij4#-vg^3)=d5t!7(levxd3yr%uyh-h3cl0*#ls&hj4ft3$1'
 
 # List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
-)
 
-MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                ],
+            }
+    }]
+
+
+MIDDLEWARE = (
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'sellnov.urls'
@@ -123,7 +133,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.admin',
+    'sellnov.apps.SellnovConfig',
     'sellnov',
     'autonumber',
     'documents',
@@ -178,3 +188,5 @@ DEFAULT_PRODUCT_UNIT = 'szt.'
 DEFAULT_TAX_RATE = '0.23'
 DEFAULT_PAYMENT_DAYS = 14
 DEFAULT_PAYMENT_TYPE = 'Przelew'
+
+SILENCED_SYSTEM_CHECKS = ['models.E026']

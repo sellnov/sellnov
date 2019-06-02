@@ -90,9 +90,12 @@ class Valuation(models.Model):
 
 
 class ValuationItem(models.Model):
-    valuation = models.ForeignKey(Valuation, verbose_name='wycena')
+    valuation = models.ForeignKey(
+            Valuation, verbose_name='wycena', on_delete=models.CASCADE)
     name = models.CharField(max_length=128, verbose_name='opis prac / etapu')
-    role = models.ForeignKey('userprofile.Role', verbose_name='rola')
+    role = models.ForeignKey(
+            'userprofile.Role', verbose_name='rola',
+            on_delete=models.PROTECT)
     min_hours = models.PositiveIntegerField(verbose_name='min godziny')
     max_hours = models.PositiveIntegerField(verbose_name='max godziny')
     notes = models.CharField(

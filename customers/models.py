@@ -11,7 +11,8 @@ CUSTOMER_TYPE_CHOICES = (
 
 
 class Customer(models.Model):
-    owner = models.ForeignKey('userprofile.BusinessEntity')
+    owner = models.ForeignKey(
+            'userprofile.BusinessEntity', on_delete=models.PROTECT)
     name = models.CharField(max_length=128)
     address = models.CharField(max_length=128)
     postal_code = models.CharField(max_length=8)
@@ -24,7 +25,7 @@ class Customer(models.Model):
     custtype = models.IntegerField(choices=CUSTOMER_TYPE_CHOICES)
     default_manhour_price = models.PositiveIntegerField(null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -33,6 +34,6 @@ class Customer(models.Model):
 
 
 class PriceList(models.Model):
-    customer = models.ForeignKey(Customer)
-    role = models.ForeignKey('userprofile.Role')
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    role = models.ForeignKey('userprofile.Role', on_delete=models.PROTECT)
     manhour_price = models.PositiveIntegerField()

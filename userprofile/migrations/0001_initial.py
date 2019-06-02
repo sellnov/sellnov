@@ -28,7 +28,9 @@ class Migration(migrations.Migration):
                 ('bank_name', models.CharField(max_length=64)),
                 ('iban', models.CharField(max_length=32)),
                 ('employers', models.ManyToManyField(related_name='works_in', to=settings.AUTH_USER_MODEL)),
-                ('owner', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('owner', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Podmiot gospodarczy',

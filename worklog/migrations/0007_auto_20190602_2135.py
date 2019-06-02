@@ -48,11 +48,15 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='valuationitem',
             name='role',
-            field=models.ForeignKey(verbose_name=b'rola', to='userprofile.Role'),
+            field=models.ForeignKey(
+                verbose_name=b'rola', to='userprofile.Role',
+                on_delete=models.PROTECT),
         ),
         migrations.AlterField(
             model_name='valuationitem',
             name='valuation',
-            field=models.ForeignKey(verbose_name=b'wycena', to='worklog.Valuation'),
+            field=models.ForeignKey(
+                verbose_name=b'wycena', to='worklog.Valuation',
+                on_delete=models.CASCADE),
         ),
     ]

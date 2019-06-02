@@ -20,6 +20,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='businessentity',
             name='owner',
-            field=models.OneToOneField(related_name='business_entity', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(
+                related_name='business_entity', to=settings.AUTH_USER_MODEL,
+                on_delete=models.CASCADE),
         ),
     ]
