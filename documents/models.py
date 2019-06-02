@@ -183,6 +183,9 @@ class Document(models.Model):
     def acquire_number(cls, date=None):
         return AutoNumber.objects.acquire(cls, date=date)
 
+    def get_formatted_number(self):
+        return format_number(type(self), self.number, self.issue_date)
+
 
 @six.python_2_unicode_compatible
 class Line(models.Model):
