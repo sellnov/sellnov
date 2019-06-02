@@ -1,10 +1,17 @@
 # encoding: utf-8
 
+from django.conf import settings
 from django.db import models
+
+
+class UnitManager(models.Manager):
+    def get_default(self):
+        return self.get_queryset().get(name=settings.DEFAULT_PRODUCT_UNIT)
 
 
 class Unit(models.Model):
     name = models.CharField(max_length=16)
+    objects = UnitManager()
 
     def __unicode__(self):
         return self.name
@@ -14,9 +21,15 @@ class Unit(models.Model):
         verbose_name_plural = 'Jednostki miary'
 
 
+class TaxManager(models.Manager):
+    def get_default(self):
+        return self.get_queryset().get(rate=settings.DEFAULT_TAX_RATE)
+
+
 class Tax(models.Model):
     name = models.CharField(max_length=32)
     rate = models.DecimalField(max_digits=3, decimal_places=2)
+    objects = TaxManager()
 
     def __unicode__(self):
         return self.name

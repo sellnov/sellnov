@@ -4,10 +4,10 @@ clear:
 	find . -name *.pyc -exec rm -f {} \;
 	find . -name *.pyo -exec rm -f {} \;
 
-env-activate: env
+env-activate:
 	(source .env/bin/activate)
 
-development : env-activate init requirements.txt
+development : env-activate requirements.txt
 
 requirements.txt :
 	(source .env/bin/activate && pip install -r $@)

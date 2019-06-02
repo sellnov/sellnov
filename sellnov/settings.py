@@ -125,6 +125,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'sellnov',
+    'autonumber',
     'documents',
     'customers',
     'userprofile',
@@ -172,3 +173,8 @@ LOGGING = {
 FONT_DIR = os.path.join(PROJECT_DIR, 'fonts')
 
 DATE_FORMAT = 'Y-m-d'
+
+DEFAULT_PRODUCT_UNIT = 'szt.'
+DEFAULT_TAX_RATE = '0.23'
+DEFAULT_PAYMENT_DAYS = 14
+DEFAULT_PAYMENT_TYPE = 'Przelew'

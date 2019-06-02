@@ -38,7 +38,9 @@ class Entry(models.Model):
     work_finished_at = models.DateField()
     work_started_at = models.DateField(null=True, blank=True)
 
-    paid = models.BooleanField(default=False)
+    invoice = models.ForeignKey(
+            'invoices.SaleInvoice', null=True, blank=True,
+            on_delete=models.SET_NULL)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

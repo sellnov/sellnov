@@ -1,10 +1,44 @@
 # encoding: utf-8
 
+import datetime
+import six
+
+from django.conf import settings
 from django.db import models
 from django.db.models import Sum
+from autonumber.models import AutoNumber, format_number
+from payments.models import PaymentType
+
+
+class DocumentManager(models.Manager):
+    def of_class(self, document_class):
+        return self.get_queryset().filter(
+                doctype=document_class.document_type_name())
+
+    def create(self, **kwargs):
+        if 'issue_date' not in kwargs:
+            kwargs['issue_date'] = datetime.date.today()
+        if 'pay_date' not in kwargs:
+            kwargs['pay_date'] = kwargs['issue_date'] + datetime.timedelta(
+                                        days=settings.DEFAULT_PAYMENT_DAYS)
+        if 'payment_type' not in kwargs:
+            kwargs['payment_type'] = PaymentType.objects.get_default()
+        kwargs['payment_name'] = kwargs['payment_type'].name
+
+        if 'location' not in kwargs and 'owner' in kwargs:
+            kwargs['location'] = kwargs['owner'].city
+        if 'number' not in kwargs:
+            kwargs['number'] = self.model.acquire_number(
+                                    date=kwargs['issue_date'])
+        kwargs['number_fmt'] = format_number(
+                self.model, kwargs['number'], kwargs['issue_date'])
+
+        return super(DocumentManager, self).create(**kwargs)
 
 
 class Document(models.Model):
+    AUTONUMBER_FORMAT = '%(number)s/%(year)s'
+
     parent = models.ForeignKey(
             'self', null=True, blank=True,
             verbose_name='Dokument powiązany (nadrzędny)')
@@ -25,6 +59,7 @@ class Document(models.Model):
             u'Osoba wystawiająca', max_length=128, blank=True, default='')
     paid = models.BooleanField(u'Zapłacona', default=False)
     doctype = models.CharField(max_length=32, editable=False)
+    objects = DocumentManager()
 
     def __unicode__(self):
         return '%s %s' % (self.doctype, self.number_fmt)
@@ -140,7 +175,16 @@ class Document(models.Model):
         return self.related_documents().filter(
                 doctype=self.doctype, issue_date__lte=self.issue_date)
 
+    @classmethod
+    def document_type_name(cls):
+        return cls._meta.model_name
 
+    @classmethod
+    def acquire_number(cls, date=None):
+        return AutoNumber.objects.acquire(cls, date=date)
+
+
+@six.python_2_unicode_compatible
 class Line(models.Model):
     document = models.ForeignKey(Document)
     product = models.ForeignKey('stock.Product', null=True, blank=True)
@@ -170,3 +214,6 @@ class Line(models.Model):
 
     def advance_payment_tax_value(self):
         return self.advance_payment_gross-self.advance_payment_net
+
+    def __str__(self):
+        return '%s (%s)' % (self.product_name, self.total_gross)

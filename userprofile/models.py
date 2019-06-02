@@ -21,7 +21,7 @@ class BusinessEntity(models.Model):
     bank_name = models.CharField(max_length=64)
     iban = models.CharField(max_length=33)
 
-    owner = models.ForeignKey('auth.User')
+    owner = models.OneToOneField('auth.User', related_name='business_entity')
     employers = models.ManyToManyField('auth.User', related_name='works_in')
 
     class Meta:

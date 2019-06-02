@@ -82,15 +82,18 @@ class LineForm(forms.ModelForm):
             raise forms.ValidationError('Required')
         data['price_net'] = value
 
-
         value = data['pkwiu']
+
         if not value and data.get('product'):
             value = data['product'].pkwiu
+
         data['pkwiu'] = value
 
         value = data['unit']
+
         if not value and data.get('product'):
             value = data['product'].unit
+
         if not value:
             raise forms.ValidationError('Required')
         data['unit'] = value
