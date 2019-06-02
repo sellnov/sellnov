@@ -20,6 +20,7 @@ class Customer(models.Model):
     email = models.EmailField(max_length=255, null=True, blank=True)
     www = models.URLField(max_length=255, null=True, blank=True)
     custtype = models.IntegerField(choices=CUSTOMER_TYPE_CHOICES)
+    default_manhour_price = models.PositiveIntegerField(null=True, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -27,4 +28,3 @@ class Customer(models.Model):
     class Meta:
         verbose_name = 'Klient'
         verbose_name_plural = 'Klienci'
-

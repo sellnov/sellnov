@@ -1,5 +1,9 @@
 .PHONY: development requirements.txt help
 
+clear:
+	find . -name *.pyc -exec rm -f {} \;
+	find . -name *.pyo -exec rm -f {} \;
+
 env-activate: env
 	(source .env/bin/activate)
 

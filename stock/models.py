@@ -28,6 +28,7 @@ class Tax(models.Model):
 
 class Product(models.Model):
     owner = models.ForeignKey('userprofile.BusinessEntity')
+    code = models.CharField(max_length=32, null=True, blank=True, unique=True)
     name = models.CharField(max_length=255)
     desc = models.TextField(null=True, blank=True)
     price_net = models.DecimalField(max_digits=22, decimal_places=2)
@@ -36,6 +37,7 @@ class Product(models.Model):
     unit = models.ForeignKey('unit')
     service = models.BooleanField()
     pkwiu = models.CharField(max_length=16, null=True, blank=True)
+    notes = models.CharField(max_length=255, null=False, blank=True)
 
     def __unicode__(self):
         return self.name

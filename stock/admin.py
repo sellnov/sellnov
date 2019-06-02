@@ -1,17 +1,54 @@
-"""
-This is a module docstring
-"""
-
-__author__ = "Marcin Nowak"
-__copyright__ = "Copyright 2013"
-__license__ = "Propertiary"
-__maintainer__ = "Marcin Nowak"
-__email__ = "marcin.j.nowak@gmail.com"
-
-
 from django.contrib import admin
-from models import Product, Tax, Unit
+from django import forms
 
-admin.site.register(Product)
+from .models import Product, Tax, Unit
+
+
+class ProductForm(forms.ModelForm):
+    price_net = forms.DecimalField(required=False)
+    price_gross = forms.DecimalField(required=False)
+
+    class Meta:
+        model = Product
+        fields = (
+                'owner', 'code', 'name', 'desc', 'price_net', 'tax',
+                'price_gross', 'unit', 'service', 'pkwiu', 'notes')
+
+    def clean(self):
+        data = self.cleaned_data
+        price_net = data.get('price_net')
+        price_gross = data.get('price_gross')
+        tax = data.get('tax')
+
+        if price_gross is None:
+            if price_net is not None and tax is not None:
+                price_gross = price_net * (1+tax.rate)
+        if price_net is None:
+            if price_gross is not None and tax is not None:
+                price_net = price_gross / (1+tax.rate)
+
+        if price_net is None and price_gross is None:
+            raise forms.ValidationError('Net or gross price is required')
+
+        data.update({
+            'price_net': price_net,
+            'price_gross': price_gross,
+            })
+
+        return data
+
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    form = ProductForm
+    list_display = (
+            'code', 'name', 'price_net', 'tax', 'price_gross', 'unit',
+            'service', 'notes')
+    list_display_links = ('code', 'name',)
+    list_filter = ('service', 'unit', 'tax')
+    search_fields = ('code', 'name', 'desc', 'pkwiu')
+    ordering = ('name',)
+
+
 admin.site.register(Tax)
 admin.site.register(Unit)
