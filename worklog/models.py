@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import decimal
 import datetime
 from django.db import models
@@ -69,3 +71,34 @@ class Entry(models.Model):
     def calc_profit(self):
         if self.associate_role:
             return self.price - self.calc_cost()
+
+
+class Valuation(models.Model):
+    customer = models.ForeignKey(
+            'customers.Customer', on_delete=models.PROTECT,
+            verbose_name='klient')
+    title = models.CharField(max_length=128, verbose_name=u'tytuł oferty')
+    date = models.DateField(verbose_name='data wyceny')
+    expiration_date = models.DateField(verbose_name=u'ważność wyceny')
+
+    class Meta:
+        verbose_name = 'wycena'
+        verbose_name_plural = 'wyceny'
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class ValuationItem(models.Model):
+    valuation = models.ForeignKey(Valuation, verbose_name='wycena')
+    name = models.CharField(max_length=128, verbose_name='opis prac / etapu')
+    role = models.ForeignKey('userprofile.Role', verbose_name='rola')
+    min_hours = models.PositiveIntegerField(verbose_name='min godziny')
+    max_hours = models.PositiveIntegerField(verbose_name='max godziny')
+    notes = models.CharField(
+            max_length=255, null=False, blank=True,
+            verbose_name='uwagi')
+
+    class Meta:
+        verbose_name = 'element wyceny'
+        verbose_name_plural = 'elementy wyceny'

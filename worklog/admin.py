@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from stock.models import Tax, Unit
 from invoices.admin import LineForm
-from .models import Entry
+from .models import Entry, Valuation, ValuationItem
 
 
 class BooleanRelatedFieldFilter(admin.BooleanFieldListFilter):
@@ -105,3 +105,13 @@ class EntryAdmin(admin.ModelAdmin):
             return redirect('admin:invoices_saleinvoice_changelist')
 
     make_invoices.short_description = u'Utwórz faktury dla wybranych prac'
+
+
+class ValuationItemsInline(admin.TabularInline):
+    model = ValuationItem
+
+
+@admin.register(Valuation)
+class ValuationAdmin(admin.ModelAdmin):
+    inlines = [ValuationItemsInline]
+    list_display = ('title', 'customer', 'date', 'expiration_date')
