@@ -45,6 +45,10 @@ class Tax(models.Model):
 class Group(models.Model):
     name = models.CharField(max_length=64)
 
+    class Meta:
+        verbose_name = 'grupa towarowa'
+        verbose_name_plural = 'grupy towarowe'
+
     def __str__(self):
         return self.name
 
@@ -67,5 +71,5 @@ class Product(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = u'Towar/usługa'
-        verbose_name_plural = u'Towary/usługi'
+        verbose_name = u'Towar i usługa'
+        verbose_name_plural = u'Towary i usługi'

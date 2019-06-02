@@ -15,6 +15,7 @@ class RoleAdmin(admin.ModelAdmin):
 
 class AssociateRoleInlineAdmin(admin.TabularInline):
     model = AssociateRoleCosts
+    fields = ('role', 'manhour_cost',)
 
 
 @admin.register(Associate)

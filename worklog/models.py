@@ -45,6 +45,10 @@ class Entry(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = 'wykonana praca'
+        verbose_name_plural = 'wykonane prace'
+
     def duration(self):
         return datetime.timedelta(
                 seconds=int(UNITS_TO_SECONDS[self.unit](float(self.time))))

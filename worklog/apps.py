@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 
 
-class WorklogConfig(AppConfig):
+class WorklogAppConfig(AppConfig):
     name = 'worklog'
+    verbose_name = 'Rejestr prac'

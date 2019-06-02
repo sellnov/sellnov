@@ -34,8 +34,13 @@ class BusinessEntity(models.Model):
 
 @six.python_2_unicode_compatible
 class Role(models.Model):
-    name = models.CharField(max_length=64)
-    manhour_price = models.PositiveIntegerField()
+    name = models.CharField(max_length=64, verbose_name='nazwa')
+    manhour_price = models.PositiveIntegerField(
+                    verbose_name=u'cena sprzedaży roboczogodziny')
+
+    class Meta:
+        verbose_name = 'rola'
+        verbose_name_plural = 'role'
 
     def __str__(self):
         return self.name
@@ -43,10 +48,14 @@ class Role(models.Model):
 
 @six.python_2_unicode_compatible
 class AssociateRoleCosts(models.Model):
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    role = models.ForeignKey(
+            Role, on_delete=models.CASCADE,
+            verbose_name='rola')
     associate = models.ForeignKey(
-            'userprofile.Associate', on_delete=models.CASCADE)
-    manhour_cost = models.PositiveIntegerField()
+            'userprofile.Associate', on_delete=models.CASCADE,
+            verbose_name=u'współpracownik')
+    manhour_cost = models.PositiveIntegerField(
+            verbose_name='koszt roboczogodziny')
 
     def __str__(self):
         return u'%s (%s): %szł' % (
@@ -56,10 +65,18 @@ class AssociateRoleCosts(models.Model):
 @six.python_2_unicode_compatible
 class Associate(models.Model):
     user = models.ForeignKey(
-            'auth.User', null=True, blank=True, on_delete=models.SET_NULL)
-    name = models.CharField(max_length=120)
-    roles = models.ManyToManyField(Role, through=AssociateRoleCosts)
-    default_manhour_cost = models.PositiveIntegerField()
+            'auth.User', null=True, blank=True, on_delete=models.SET_NULL,
+            verbose_name='konto')
+    name = models.CharField(max_length=120, verbose_name='nazwisko')
+    roles = models.ManyToManyField(
+            Role, through=AssociateRoleCosts,
+            verbose_name='role')
+    default_manhour_cost = models.PositiveIntegerField(
+            verbose_name=u'domyślny koszt roboczogodziny')
+
+    class Meta:
+        verbose_name = u'współpracownik'
+        verbose_name_plural = u'współpracownicy'
 
     def __str__(self):
         return self.name
