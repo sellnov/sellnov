@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django import forms
 
-from .models import Product, Tax, Unit
+from .models import Product, Tax, Unit, Group
 
 
 class ProductForm(forms.ModelForm):
@@ -11,7 +11,7 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = (
-                'owner', 'code', 'name', 'desc', 'price_net', 'tax',
+                'owner', 'code', 'name', 'group', 'desc', 'price_net', 'tax',
                 'price_gross', 'unit', 'service', 'pkwiu', 'notes')
 
     def clean(self):
@@ -42,12 +42,17 @@ class ProductForm(forms.ModelForm):
 class ProductAdmin(admin.ModelAdmin):
     form = ProductForm
     list_display = (
-            'code', 'name', 'price_net', 'tax', 'price_gross', 'unit',
+            'code', 'name', 'group', 'price_net', 'tax', 'price_gross', 'unit',
             'service', 'notes')
     list_display_links = ('code', 'name',)
-    list_filter = ('service', 'unit', 'tax')
+    list_filter = ('service', 'group', 'unit', 'tax')
     search_fields = ('code', 'name', 'desc', 'pkwiu')
     ordering = ('name',)
+
+
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    pass
 
 
 admin.site.register(Tax)

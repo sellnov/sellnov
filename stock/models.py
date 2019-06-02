@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+import six
+
 from django.conf import settings
 from django.db import models
 
@@ -39,9 +41,18 @@ class Tax(models.Model):
         verbose_name_plural = 'Stawki VAT'
 
 
+@six.python_2_unicode_compatible
+class Group(models.Model):
+    name = models.CharField(max_length=64)
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     owner = models.ForeignKey('userprofile.BusinessEntity')
     code = models.CharField(max_length=32, null=True, blank=True, unique=True)
+    group = models.ForeignKey(Group, null=True, blank=True)
     name = models.CharField(max_length=255)
     desc = models.TextField(null=True, blank=True)
     price_net = models.DecimalField(max_digits=22, decimal_places=2)

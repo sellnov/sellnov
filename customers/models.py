@@ -2,11 +2,13 @@
 
 from django.db import models
 
+
 CUSTOMER_TYPE_CHOICES = (
        (0, 'Dostawca/Odbiorca'),
        (1, 'Dostawca'),
        (2, 'Odbiorca'),
 )
+
 
 class Customer(models.Model):
     owner = models.ForeignKey('userprofile.BusinessEntity')
@@ -28,3 +30,9 @@ class Customer(models.Model):
     class Meta:
         verbose_name = 'Klient'
         verbose_name_plural = 'Klienci'
+
+
+class PriceList(models.Model):
+    customer = models.ForeignKey(Customer)
+    role = models.ForeignKey('userprofile.Role')
+    manhour_price = models.PositiveIntegerField()
