@@ -5,3 +5,4 @@
 /sellnov-client/ext
 /sellnov-client/resources
 *.swp
+/sellnov/static

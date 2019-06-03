@@ -77,6 +77,9 @@ class Valuation(models.Model):
     customer = models.ForeignKey(
             'customers.Customer', on_delete=models.PROTECT,
             verbose_name='klient')
+    ticket = models.ForeignKey(
+            'tickets.Ticket', null=True, blank=True,
+            on_delete=models.SET_NULL)
     title = models.CharField(max_length=128, verbose_name=u'tytuł oferty')
     date = models.DateField(verbose_name='data wyceny')
     expiration_date = models.DateField(verbose_name=u'ważność wyceny')

@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import filesanitize
 
 from django.contrib import admin
@@ -19,6 +21,10 @@ def print_document(request, pk):
 
 
 class SellnovAdminSite(admin.AdminSite):
+    site_title = 'SELLNOV - nowak.tech'
+    site_header = 'SELLNOV - nowak.tech'
+    index_title = 'Dostępne moduły'
+
     def get_urls(self):
         urls = super().get_urls()
         urls.append(
