@@ -95,7 +95,6 @@ class DocumentAdmin(admin.ModelAdmin):
         ret = super(DocumentAdmin, self).save_model(
                                 request, obj, form, change)
         if not change:
-            import ipdb; ipdb.set_trace()
             customer = form.cleaned_data['selected_customer']
             customer_data = model_to_dict(customer)
             customer_data.pop('id', None)
