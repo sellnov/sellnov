@@ -10,7 +10,7 @@ CUSTOMER_TYPE_CHOICES = (
 )
 
 
-class Customer(models.Model):
+class AbstractCustomer(models.Model):
     owner = models.ForeignKey(
             'userprofile.BusinessEntity', on_delete=models.PROTECT)
     name = models.CharField(max_length=128)
@@ -25,9 +25,14 @@ class Customer(models.Model):
     custtype = models.IntegerField(choices=CUSTOMER_TYPE_CHOICES)
     default_manhour_price = models.PositiveIntegerField(null=True, blank=True)
 
+    class Meta:
+        abstract = True
+
     def __str__(self):
         return self.name
 
+
+class Customer(AbstractCustomer):
     class Meta:
         verbose_name = 'Klient'
         verbose_name_plural = 'Klienci'

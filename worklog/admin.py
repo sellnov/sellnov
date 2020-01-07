@@ -4,11 +4,12 @@ import itertools
 
 from django.contrib import admin
 from django.db import transaction
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
+from django.urls import path
 from django.utils.translation import ugettext_lazy as _
-
-from stock.models import Tax, Unit
 from invoices.admin import LineForm
+from stock.models import Tax, Unit
+
 from .models import Entry, Valuation, ValuationItem
 
 
@@ -109,9 +110,43 @@ class EntryAdmin(admin.ModelAdmin):
 
 class ValuationItemsInline(admin.TabularInline):
     model = ValuationItem
+    readonly_fields = ('min_price', 'max_price')
+    fields = (
+        'name', 'role', 'min_hours', 'max_hours',
+        'min_price', 'max_price',
+        'proposed_price', 'notes')
+
+    def min_price(self, obj):
+        return obj.min_price()
+
+    def max_price(self, obj):
+        return obj.max_price()
 
 
 @admin.register(Valuation)
 class ValuationAdmin(admin.ModelAdmin):
     inlines = [ValuationItemsInline]
     list_display = ('title', 'customer', 'date', 'expiration_date')
+
+    def preview(self, request, object_id):
+        instance = self.get_queryset(request).get(pk=object_id)
+        return render(
+                request,
+                'admin/worklog/valuation_preview.html', {
+                    'title': 'Podgląd wyceny',
+                    'admin_site': self.admin_site.name,
+                    'opts': self.model._meta,
+                    'app_label': self.model._meta.app_label,
+                    'object': instance,
+                    'original': instance,
+                    'has_change_permission': False,
+                    })
+
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            path(
+                '<int:object_id>/preview/',
+                self.admin_site.admin_view(self.preview)),
+            ]
+        return my_urls + urls

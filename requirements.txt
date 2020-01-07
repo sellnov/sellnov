@@ -7,3 +7,5 @@ filesanitize==1.1.0
 ipdb
 ipython
 arrow
+django-markwhat==1.6.1
+commonmark==0.9.0

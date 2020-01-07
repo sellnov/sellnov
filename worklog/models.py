@@ -3,6 +3,8 @@
 import decimal
 import datetime
 from django.db import models
+from django.db.models import Sum
+from customers.models import PriceList
 
 
 UNITS_TO_SECONDS = {
@@ -83,6 +85,9 @@ class Valuation(models.Model):
     title = models.CharField(max_length=128, verbose_name=u'tytuł oferty')
     date = models.DateField(verbose_name='data wyceny')
     expiration_date = models.DateField(verbose_name=u'ważność wyceny')
+    implementation_days = models.PositiveIntegerField(null=True, blank=True)
+    description = models.TextField(null=False, blank=True, default='')
+    notes = models.TextField(null=False, blank=True, default='')
 
     class Meta:
         verbose_name = 'wycena'
@@ -90,6 +95,25 @@ class Valuation(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def total_min_hours(self):
+        return self.valuationitem_set.aggregate(
+                Sum('min_hours'))['min_hours__sum']
+
+    def total_max_hours(self):
+        return self.valuationitem_set.aggregate(
+                Sum('max_hours'))['max_hours__sum']
+
+    def price_for_role(self, role):
+        try:
+            price = self.customer.pricelist_set.get(role=role).manhour_price
+        except PriceList.DoesNotExist:
+            price = self.customer.default_manhour_price
+        return price or 0
+
+    def total_proposed_price(self):
+        return self.valuationitem_set.aggregate(
+                Sum('proposed_price'))['proposed_price__sum']
 
 
 class ValuationItem(models.Model):
@@ -101,6 +125,8 @@ class ValuationItem(models.Model):
             on_delete=models.PROTECT)
     min_hours = models.PositiveIntegerField(verbose_name='min godziny')
     max_hours = models.PositiveIntegerField(verbose_name='max godziny')
+    proposed_price = models.DecimalField(
+            decimal_places=2, max_digits=10, null=True, blank=True)
     notes = models.CharField(
             max_length=255, null=False, blank=True,
             verbose_name='uwagi')
@@ -108,3 +134,11 @@ class ValuationItem(models.Model):
     class Meta:
         verbose_name = 'element wyceny'
         verbose_name_plural = 'elementy wyceny'
+
+    def min_price(self):
+        price = self.valuation.price_for_role(self.role)
+        return self.min_hours * price
+
+    def max_price(self):
+        price = self.valuation.price_for_role(self.role)
+        return self.max_hours * price

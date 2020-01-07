@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Sum
 from autonumber.models import AutoNumber, format_number
+from customers.models import AbstractCustomer, Customer
 from payments.models import PaymentType
 
 
@@ -43,9 +44,10 @@ class Document(models.Model):
             'self', null=True, blank=True,
             verbose_name='Dokument powiązany (nadrzędny)',
             on_delete=models.PROTECT)
-    customer = models.ForeignKey(
-            'customers.Customer', verbose_name='Klient',
-            on_delete=models.PROTECT)
+    selected_customer = models.ForeignKey(
+            'customers.Customer', verbose_name='Wybrany klient',
+            on_delete=models.PROTECT,
+            db_column='customer_id')
     owner = models.ForeignKey(
             'userprofile.BusinessEntity', verbose_name='Podmiot',
             on_delete=models.PROTECT)
@@ -190,6 +192,16 @@ class Document(models.Model):
 
     def get_formatted_number(self):
         return format_number(type(self), self.number, self.issue_date)
+
+
+class DocumentCustomer(AbstractCustomer):
+    document = models.OneToOneField(
+            Document, on_delete=models.CASCADE,
+            related_name='customer')
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+
+    class Meta:
+        db_table = 'documents_customer'
 
 
 @six.python_2_unicode_compatible
