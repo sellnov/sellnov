@@ -1,4 +1,4 @@
-Django==2.2.1
+Django==3.0.2
 reportlab==3.5.23
 Pillow==6.0.0
 z3c.rml==3.6.3

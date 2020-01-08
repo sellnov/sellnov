@@ -10,6 +10,7 @@ env-activate:
 development : env-activate requirements.txt
 
 requirements.txt :
+	(source env/bin/activate && pip install pip --upgrade)
 	(source env/bin/activate && pip install -r $@)
 
 runserver:
