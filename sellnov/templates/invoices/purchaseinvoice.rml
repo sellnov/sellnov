@@ -3,7 +3,7 @@
 <document filename="{{ object.number }}" xmlns:doc="http://namespaces.zope.org/rml/doc">
 
     <docinit doc:example="">
-        <registerTTFont faceName="Fixed" fileName="Vera.ttf" doc:example="" />
+        <registerTTFont faceName="Fixed" fileName="{{ fontdir}}/Vera.ttf" doc:example="" />
         <registerTTFont faceName="Sans" fileName="{{ fontdir }}/LiberationSans-Regular.ttf" doc:example="" />
         <registerTTFont faceName="SansItalic" fileName="{{ fontdir }}/LiberationSans-Italic.ttf" doc:example="" />
         <registerTTFont faceName="SansBold" fileName="{{ fontdir }}/LiberationSans-Bold.ttf" doc:example="" />
@@ -145,7 +145,7 @@
 
         <spacer length="1cm"/>
 
-        <blockTable colWidths="22.0,196.0,35.0,21.0,26.0,49.0,41.0,41.0,40.0,39.0" style="Products">
+        <blockTable colWidths="22.0,196.0,46.0,26.0,36.0,42.0,41.0,41.0,40.0,39.0" style="Products">
             <tr>
                 <td>
                     <para style="P9">Lp.</para>

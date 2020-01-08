@@ -26,13 +26,13 @@ DATABASES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['sellnov.local', '127.0.0.1:7000', '127.0.0.1', 'localhost']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'Europe/Warsaw'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -66,7 +66,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
@@ -91,30 +91,39 @@ STATICFILES_FINDERS = (
 SECRET_KEY = '9@ij4#-vg^3)=d5t!7(levxd3yr%uyh-h3cl0*#ls&hj4ft3$1'
 
 # List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
-)
 
-MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'DIRS': [
+            os.path.join(PROJECT_DIR, 'templates'),
+            ],
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                ],
+            }
+    }]
+
+
+MIDDLEWARE = (
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'sellnov.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'sellnov.wsgi.application'
-
-TEMPLATE_DIRS = (
-        os.path.join(PROJECT_DIR, 'templates'),
-)
+WSGI_APPLICATION = 'wsgi.application'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -123,15 +132,19 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.admin',
-    'south',
+    'django_markwhat',
+    'sellnov.apps.SellnovConfig',
     'sellnov',
+    'autonumber',
+    'documents',
     'customers',
     'userprofile',
     'stock',
     'invoices',
     'payments',
     'cash',
+    'tickets',
+    'worklog',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -170,3 +183,10 @@ LOGGING = {
 FONT_DIR = os.path.join(PROJECT_DIR, 'fonts')
 
 DATE_FORMAT = 'Y-m-d'
+
+DEFAULT_PRODUCT_UNIT = 'szt.'
+DEFAULT_TAX_RATE = '0.23'
+DEFAULT_PAYMENT_DAYS = 14
+DEFAULT_PAYMENT_TYPE = 'Przelew'
+
+SILENCED_SYSTEM_CHECKS = ['models.E026']

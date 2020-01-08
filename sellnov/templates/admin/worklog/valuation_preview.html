@@ -1,0 +1,77 @@
+{% extends "admin/change_form.html" %}
+{% load i18n markup %}
+
+{% block content %}
+
+<h2>{{ object.title }} dla {{ object.customer }}</h2>
+<hr />
+<p><small>Oferta ważna do {{ object.expiration_date }}</small></p>
+<br /><br />
+
+<table>
+    <thead>
+        <tr>
+            <th>Opis prac</th>
+            <th>Rola</th>
+            <th>Min.</th>
+            <th>Max.</th>
+            <th>Cena min.</th>
+            <th>Cena max.</th>
+            <th>Cena ofertowa</th>
+            <th>Uwagi</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for item in object.valuationitem_set.all %}
+        <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.role.name }}</td>
+            <td>{{ item.min_hours }}</td>
+            <td>{{ item.max_hours }}</td>
+            <td>{{ item.min_price }}</td>
+            <td>{{ item.max_price }}</td>
+            <td>{{ item.proposed_price|default:"-" }}</td>
+            <td>{{ item.notes }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td></td>
+            <td>{{ object.total_min_hours }}</td>
+            <td>{{ object.total_max_hours }}</td>
+            <td>{{ object.total_min_price }}</td>
+            <td>{{ object.total_max_price }}</td>
+            <td>{{ object.total_proposed_price }}</td>
+        </tr>
+    </tfoot>
+</table>
+
+<h3>Oferta</h3>
+<p>{{ object.description|commonmark }}</p>
+<br />
+<hr />
+<br />
+<p>
+    <ul>
+        <li><strong>Cena:</strong> {{ object.total_proposed_price }}zł netto</li>
+        <li><strong>Czas realizacji:</strong> {{ object.implementation_days }} dni roboczych (od rozpoczęcia prac)</li>
+    </ul>
+</p>
+
+{% if object.notes %}
+<br />
+<hr />
+<br />
+<h3>Uwagi</h3>
+<p>{{ object.notes|commonmark }}</p>
+{% endif %}
+
+<br />
+<hr />
+<br />
+<a class="button" href="../change">Popraw</a>
+
+{% endblock %}

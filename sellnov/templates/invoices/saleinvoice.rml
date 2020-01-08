@@ -3,7 +3,7 @@
 <document filename="{{ object.number }}" xmlns:doc="http://namespaces.zope.org/rml/doc">
 
     <docinit doc:example="">
-        <registerTTFont faceName="Fixed" fileName="Vera.ttf" doc:example="" />
+        <registerTTFont faceName="Fixed" fileName="{{ fontdir }}/Vera.ttf" doc:example="" />
         <registerTTFont faceName="Sans" fileName="{{ fontdir }}/LiberationSans-Regular.ttf" doc:example="" />
         <registerTTFont faceName="SansItalic" fileName="{{ fontdir }}/LiberationSans-Italic.ttf" doc:example="" />
         <registerTTFont faceName="SansBold" fileName="{{ fontdir }}/LiberationSans-Bold.ttf" doc:example="" />
@@ -25,6 +25,7 @@
         <paraStyle name="FrameBodySmall" parent="P2" alignment="CENTER" leading="21" />
         <paraStyle name="FrameBody" parent="P2" alignment="LEFT" leading="14" />
         <paraStyle name="H1" fontName="SansBold" fontSize="14" leading="16" spaceAfter="0.1cm"/>
+        <paraStyle name="H2" fontName="SansBold" fontSize="12" leading="14" spaceAfter="0.1cm"/>
         <paraStyle name="Title" parent="H1" alignment="CENTER" />
         <paraStyle name="H3" fontName="SansBold" fontSize="10" leading="12" spaceAfter="0.1cm"/>
         <paraStyle name="P9" fontName="Sans" fontSize="6" leading="7" alignment="CENTER"/>
@@ -95,7 +96,11 @@
                     {% endif %}
                 </td>
                 <td>
-                    <para style="Title" fontName="SansBold">Faktura VAT {{ object.number_fmt }}<br/>{% if copy %}KOPIA{% else %}ORYGINAŁ{% endif %}</para>
+                    <para style="Title" fontName="SansBold">
+                        Faktura VAT {{ object.number_fmt }}<br/>
+                        {% if object.is_final_invoice %}końcowa<br />{% endif %}
+                        {% if copy %}KOPIA{% else %}ORYGINAŁ{% endif %}
+                    </para>
                 </td>
                 <td>
                     <blockTable style="Frame"><tr><td>
@@ -113,7 +118,7 @@
                 </td>
             </tr>
         </blockTable>
-        <spacer length="1cm"/>
+        <spacer length="0.5cm"/>
         <blockTable colWidths="50%,50%" style="Tabela1">
             <tr>
                 <td>
@@ -145,7 +150,7 @@
 
         <spacer length="1cm"/>
 
-        <blockTable colWidths="22.0,196.0,35.0,21.0,26.0,49.0,41.0,41.0,40.0,39.0" style="Products">
+        <blockTable colWidths="22.0,196.0,42.0,26.0,36.0,36.0,41.0,41.0,40.0,39.0" style="Products">
             <tr>
                 <td>
                     <para style="P9">Lp.</para>
@@ -178,7 +183,7 @@
                     <para style="P9">Wartość brutto</para>
                 </td>
             </tr>
-            {% for item in object.line_set.all %}
+            {% for item in object.lines_ordered %}
             <tr>
                 <td>
                     <para style="P7">{{ forloop.counter }}</para>
@@ -298,10 +303,182 @@
             </tr>           
         </blockTable>
 
-        <spacer length="1cm"/>
+        {% if object.is_final_invoice %}
+
+        {% with object.advance_invoices as previous_list %}
+        {% if previous_list %}
+        <spacer length="0.5cm"/>
+        <para style="H2">Poprzednie zaliczki</para>
+        <blockTable colWidths="22.0,218.0,45.0,45.0,26.0,49.0,41.0,41.0,40.0,39.0" style="Products" alignment="left">
+            <tr>
+                <td>
+                    <para style="P9">Lp.</para>
+                </td>
+                <td>
+                    <para style="P9">Numer faktury</para>
+                </td>
+                <td>
+                    <para style="P9">Data</para>
+                </td>
+                <td>
+                    <para style="P9">Wartość netto</para>
+                </td>
+                <td>
+                    <para style="P9">Stawka VAT</para>
+                </td>
+                <td>
+                    <para style="P9">Kwota VAT</para>
+                </td>
+                <td>
+                    <para style="P9">Wartość brutto</para>
+                </td>
+            </tr>
+            {% for item in previous_list %}
+            {% for prevsum in item.advance_payment_tax_summary %}
+            <tr>
+                <td>
+                    <para style="P7">{% cycle 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 %}</para>
+                </td>
+                <td>
+                    <para style="P6">{{ item.number_fmt }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ item.issue_date|date }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ prevsum.total_net }}</para>
+                </td>
+                <td>
+                    <para style="P7" alignment="CENTER">{{ prevsum.tax__name }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ prevsum.tax_value }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ prevsum.total_gross }}</para>
+                </td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+            <tr>
+                <td><para style="P8">Razem:</para></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                    <para style="P7">{{ item.total_advance_payment_net }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ object.total_advance_payment_tax_value }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ object.total_advance_payment_gross }}</para>
+                </td>
+            </tr>
+        </blockTable>
+        {% endif %}
+        {% endwith %}
+
+        <para style="H2">Zamówienie</para>
+
+        <blockTable colWidths="22.0,218.0,35.0,21.0,26.0,49.0,41.0,41.0,40.0,39.0" style="Products" alignment="left">
+            <tr>
+                <td>
+                    <para style="P9">Lp.</para>
+                </td>
+                <td>
+                    <para style="P9">Nazwa produktu, towaru lub usługi</para>
+                </td>
+                <td>
+                    <para style="P9">PKWiU</para>
+                </td>
+                <td>
+                    <para style="P9">J.m.</para>
+                </td>
+                <td>
+                    <para style="P9">Ilość</para>
+                </td>
+                <td>
+                    <para style="P9">Cena netto</para>
+                </td>
+                <td>
+                    <para style="P9">Stawka VAT</para>
+                </td>
+                <td>
+                    <para style="P9">Wartość netto</para>
+                </td>
+                <td>
+                    <para style="P9">Kwota VAT</para>
+                </td>
+                <td>
+                    <para style="P9">Wartość brutto</para>
+                </td>
+            </tr>
+            {% for item in object.original_order_lines %}
+            <tr>
+                <td>
+                    <para style="P7">{{ forloop.counter }}</para>
+                </td>
+                <td>
+                    <para style="P6">{{ item.product_name }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ item.pkwiu }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ item.unit_name }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ item.quantity }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ item.price_net }}</para>
+                </td>
+                <td>
+                    <para style="P7" alignment="CENTER">{{ item.tax_rate_prc }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ item.total_net }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ item.tax_value }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ item.total_gross }}</para>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td><para style="P8">Razem:</para></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                    <para style="P7">{{ object.original_order.total_net }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ object.original_order.total_tax_value }}</para>
+                </td>
+                <td>
+                    <para style="P7">{{ object.original_order.total_gross }}</para>
+                </td>
+            </tr>
+        </blockTable>
+
+        <spacer length="0.5cm"/>
+
+        {% endif %} {# is_final_invoice #}
 
         {% if object.paid %}
-        <para style="P1">Zapłacono: {{ object.total_paid }} {{ object.currency }}</para>
+        <para style="P1">
+            Zapłacono: {{ object.total_paid }} {{ object.currency }}
+            {% if object.payment_type %}<br />
+            Sposób płatności: {{ object.payment_type.name }}<br />
+            {% endif %}
+        </para>
         {% else %}  
         <para style="P1">
             Do zapłaty: {{ object.total_unpaid }} {{ object.currency }}<br />
@@ -313,6 +490,7 @@
 
         <spacer length="1cm"/>
 
+        <condPageBreak height="4cm" />
         <blockTable colWidths="40%,20%,40%">
             <tr>
                 <td>
@@ -347,7 +525,6 @@
             </tr>
         </blockTable>
         <nextFrame/>
-        <para style="Footer">Wygenerowano za pomocą programu Sellnov - Faktury Online v0.1 NTSmedia Marcin Nowak</para>
     {% if object.comment %}
         <nextFrame/>
         <pageBreak/>

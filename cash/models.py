@@ -4,7 +4,7 @@ from django.db import models
 class Account(models.Model):
     name = models.CharField(max_length=32)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -18,19 +18,19 @@ class Operation(models.Model):
     class Meta:
         ordering = ('date', '-created')
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s: %s (%s)' % (self.date, self.title, self.estimated_amount)
 
 
 class Transfer(models.Model):
-    account = models.ForeignKey(Account)
-    operation = models.ForeignKey(Operation)
+    account = models.ForeignKey(Account, on_delete=models.PROTECT)
+    operation = models.ForeignKey(Operation, on_delete=models.PROTECT)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
 
 class TransferWithBalance(models.Model):
-    account = models.ForeignKey(Account)
-    operation = models.ForeignKey(Operation)
+    account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
+    operation = models.ForeignKey(Operation, on_delete=models.DO_NOTHING)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     balance = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -42,7 +42,7 @@ class TransferWithBalance(models.Model):
 class MonthlyTransferBalance(models.Model):
     year = models.PositiveIntegerField(primary_key=True)
     month = models.PositiveIntegerField(primary_key=True)
-    account = models.ForeignKey(Account)
+    account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
     sum_amount = models.DecimalField(max_digits=10, decimal_places=2)
     balance = models.DecimalField(max_digits=10, decimal_places=2)
 

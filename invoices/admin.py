@@ -1,48 +1,26 @@
 # coding: utf-8
-"""
-This is a module docstring
-"""
 
-__author__ = "Marcin Nowak"
-__copyright__ = "Copyright 2013"
-__license__ = "Propertiary"
-__maintainer__ = "Marcin Nowak"
-__email__ = "marcin.j.nowak@gmail.com"
+import datetime
 
 from django.contrib import admin
-from django.conf.urls.defaults import patterns, url
-from django.db.models import Sum
-from django.http import HttpResponse
+from django.conf import settings
 from django import forms
-from models import SaleInvoice, PurchaseInvoice
-from documents.models import Line
+from documents.admin import LineAdmin, DocumentAdmin
+from documents.forms import LineForm
+from payments.models import PaymentType
+from .forms import SaleInvoiceForm
+from .models import (
+        SaleInvoice, PurchaseInvoice, SaleReceipt, ProFormaInvoice,
+        AdvanceInvoice)
 
 
-class LineForm(forms.ModelForm):
-    price_gross = forms.DecimalField(label='Cena brutto', required=False,
-            widget=forms.TextInput(attrs={'size': 8, 'disabled': True}))
-    price_net = forms.DecimalField(label='Cena netto', required=False,
-            widget=forms.TextInput(attrs={'size': 8 }))
-    product_name = forms.CharField(label=u'Produkt/usługa', required=False,
-            widget=forms.Textarea(attrs={'cols': 20, 'rows': 4}))
-    unit_name = forms.CharField(label=u'Jedn.', required=False,
-            widget=forms.TextInput(attrs={'size': 4,'disabled': True}))
-    total_net = forms.DecimalField(label=u'Wart.netto', required=False,
-            widget=forms.TextInput(attrs={'size': 10, 'disabled': True}))
-    total_gross = forms.DecimalField(label=u'Wart.brutto', required=False,
-            widget=forms.TextInput(attrs={'size': 10, 'disabled': True}))
-    tax_value = forms.DecimalField(label=u'VAT', required=False,
-            widget=forms.TextInput(attrs={'size': 5, 'disabled': True}))
-    tax_rate = forms.DecimalField(label=u'Stawka', required=False,
-            widget=forms.TextInput(attrs={'size': 3, 'disabled': True}))
-    quantity = forms.DecimalField(label=u'Ilość', required=True,
+class AdvancePaymentLineForm(LineForm):
+    advance_payment_net = forms.DecimalField(
+            label=u'Zaliczka netto', required=False,
             widget=forms.TextInput(attrs={'size': 5}))
-
-    class Meta:
-        model = Line
-        fields = ('product', 'product_name', 'pkwiu', 'unit_name', 'unit',
-                'price_net', 'quantity', 'tax', 'tax_rate', 'tax_value',
-                'price_gross', 'total_net', 'total_gross')
+    advance_payment_gross = forms.DecimalField(
+            label=u'Zaliczka brutto', required=False,
+            widget=forms.TextInput(attrs={'size': 5}))
 
     def clean(self):
         data = super(LineForm, self).clean()
@@ -60,7 +38,6 @@ class LineForm(forms.ModelForm):
         if not value:
             raise forms.ValidationError('Required')
         data['price_net'] = value
-
 
         value = data['pkwiu']
         if not value and data.get('product'):
@@ -115,66 +92,64 @@ class LineForm(forms.ModelForm):
         return data
 
 
-class LineAdmin(admin.TabularInline):
-    model = Line
-    form = LineForm
-    fields = ('product', 'product_name', 'pkwiu', 'unit', 'unit_name',
-            'price_net', 'quantity', 'tax', 'tax_rate', 'price_gross',
-            'total_net', 'tax_value', 'total_gross',)
-
-    def formfield_for_dbfield(self, db_field, **kwargs):
-        if db_field.name == 'product_name':
-            kwargs['widget'] = forms.Textarea(attrs={'rows': 4})
-        elif db_field.name in ('pkwiu', 'price_net', 'price_gross',
-                'total_net', 'total_gross', 'quantity', 'tax_value'):
-            kwargs['widget'] = forms.TextInput(attrs={'size': 10})
-        return super(LineAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+class AdvancePaymentLineAdmin(LineAdmin):
+    form = AdvancePaymentLineForm
+    fields = list(LineAdmin.fields)+[
+            'advance_payment_net', 'advance_payment_gross']
 
 
-class DocumentAdmin(admin.ModelAdmin):
-    inlines = [LineAdmin]
-    list_display = ['number_fmt', 'customer', 'total_net', 'total_vat',
-            'total_gross', 'operation_date', 'issue_date', 'pay_date', 'paid']
-
-    def total_net(self, obj):
-        return obj.line_set.aggregate(Sum('total_net'))['total_net__sum']
-
-    def total_gross(self, obj):
-        return obj.line_set.aggregate(Sum('total_gross'))['total_gross__sum']
-
-    def total_vat(self, obj):
-        return obj.line_set.aggregate(Sum('tax_value'))['tax_value__sum']
-
-    def print_document(self, request, object_id):
-        invoice = self.get_object(request, object_id)
-        pdf = invoice.as_pdf({'copy': request.GET.get('copy')})
-        resp = HttpResponse(content=pdf.read(), content_type='application/pdf')
-        resp['Content-Disposition']='filename=FakturaVAT_%s.pdf' % invoice.number_fmt
-        return resp
-
-    def get_urls(self):
-        urls = super(DocumentAdmin, self).get_urls()
-        my_urls = patterns('',
-            url(r'^(.+)/print/$',
-                admin.site.admin_view(self.print_document),
-                name='document_print'),
-            )
-        return my_urls + urls
-
-    def queryset(self, request):
-        return super(DocumentAdmin, self).queryset(request).filter(
-                doctype=self.model._meta.module_name)
-
-
+@admin.register(SaleInvoice)
 class SaleInvoiceAdmin(DocumentAdmin):
-    pass
+    form = SaleInvoiceForm
+    readonly_fields = ('number',)
+
+    def save_model(self, request, obj, form, change):
+        if obj.number is None:
+            obj.number = type(obj).acquire_number(date=obj.issue_date)
+
+        if not obj.number_fmt:
+            obj.number_fmt = obj.get_formatted_number()
+
+        return super(SaleInvoiceAdmin, self).save_model(
+                                        request, obj, form, change)
+
+    def get_changeform_initial_data(self, request):
+        data = super(
+            SaleInvoiceAdmin, self).get_changeform_initial_data(request)
+        if 'location' not in data:
+            data['location'] = request.user.business_entity.city
+        if 'payment_type' not in data:
+            data['payment_type'] = PaymentType.objects.get_default().pk
+        if 'issue_date' not in data:
+            data['issue_date'] = datetime.date.today()
+        if 'operation_date' not in data:
+            data['operation_date'] = datetime.date.today()
+        if 'pay_date' not in data:
+            data['pay_date'] = data['issue_date'] + datetime.timedelta(
+                                        days=settings.DEFAULT_PAYMENT_DAYS)
+        if 'owner' not in data:
+            data['owner'] = request.user.business_entity.pk
+
+        return data
 
 
 class PurchaseInvoiceAdmin(DocumentAdmin):
     pass
 
 
-admin.site.register(SaleInvoice, SaleInvoiceAdmin)
+class SaleReceiptAdmin(DocumentAdmin):
+    pass
+
+
+class ProFormaInvoiceAdmin(DocumentAdmin):
+    pass
+
+
+class AdvanceInvoiceAdmin(DocumentAdmin):
+    inlines = [AdvancePaymentLineAdmin]
+
+
 admin.site.register(PurchaseInvoice, PurchaseInvoiceAdmin)
-
-
+admin.site.register(SaleReceipt, SaleReceiptAdmin)
+admin.site.register(ProFormaInvoice, ProFormaInvoiceAdmin)
+admin.site.register(AdvanceInvoice, AdvanceInvoiceAdmin)

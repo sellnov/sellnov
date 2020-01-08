@@ -1,36 +1,26 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'PaymentType'
-        db.create_table(u'payments_paymenttype', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=64)),
-            ('transfer', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('due_days', self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'payments', ['PaymentType'])
+    dependencies = [
+    ]
 
-
-    def backwards(self, orm):
-        # Deleting model 'PaymentType'
-        db.delete_table(u'payments_paymenttype')
-
-
-    models = {
-        u'payments.paymenttype': {
-            'Meta': {'object_name': 'PaymentType'},
-            'due_days': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
-            'transfer': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        }
-    }
-
-    complete_apps = ['payments']
+    operations = [
+        migrations.CreateModel(
+            name='PaymentType',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=64)),
+                ('transfer', models.BooleanField()),
+                ('due_days', models.PositiveIntegerField(null=True, blank=True)),
+            ],
+            options={
+                'verbose_name': 'Spos\xf3b p\u0142atno\u015bci',
+                'verbose_name_plural': 'Sposoby p\u0142atno\u015bci',
+            },
+        ),
+    ]
