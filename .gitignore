@@ -6,3 +6,5 @@
 /sellnov-client/resources
 *.swp
 /sellnov/static
+/sellnov/settings_local.py
+/develop-apps
