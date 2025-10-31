@@ -19,7 +19,7 @@ MANAGERS = ADMINS
 
 DATABASES = {
     "default": {
-        "ENGINE": config("DB_ENGINE", "django.db.backends.postgresql_psycopg2"),
+        "ENGINE": config("DB_ENGINE", "django.db.backends.postgresql"),
         "NAME": config("DB_NAME", "sellnov"),
         "USER": config("DB_USER", ""),
         "PASSWORD": secret("DB_PASSWORD"),

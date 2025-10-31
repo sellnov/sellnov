@@ -2,15 +2,19 @@
 
 from django.conf import settings
 from django.db import models
+from userprofile.models import AbstractBusinessEntity
 
 
 class PaymentTypeManager(models.Manager):
-    def get_default(self):
-        return self.get_queryset().get(name=settings.DEFAULT_PAYMENT_TYPE)
-
-    def get_default_for_cash(self):
+    def get_default(self, business_entity: AbstractBusinessEntity):
         try:
-            return self.get_queryset().filter(transfer=False)[0]
+            return business_entity.default_transfer_payment_type
+        except PaymentType.DoesNotExist:
+            return None
+
+    def get_default_for_cash(self, business_entity: AbstractBusinessEntity):
+        try:
+            return business_entity.default_cash_payment_type
         except IndexError:
             return None
 
@@ -25,14 +29,16 @@ class PaymentType(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = u'Sposób płatności'
-        verbose_name_plural = u'Sposoby płatności'
+        verbose_name = "Sposób płatności"
+        verbose_name_plural = "Sposoby płatności"
 
 
 class Operation(models.Model):
     document = models.ForeignKey(
-        'documents.Document', related_name='payment_operations',
-        on_delete=models.CASCADE)
+        "documents.Document",
+        related_name="payment_operations",
+        on_delete=models.CASCADE,
+    )
     amount = models.DecimalField(max_digits=14, decimal_places=2)
     title = models.CharField(max_length=255, null=True, blank=True)
     date = models.DateField()

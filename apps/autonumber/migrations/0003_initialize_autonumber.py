@@ -8,6 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('autonumber', '0002_autonumber_reset_by'),
+        ('documents', '0001_initial'),
     ]
 
     operations = [

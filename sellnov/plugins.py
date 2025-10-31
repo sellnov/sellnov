@@ -7,6 +7,8 @@ from pathlib import Path
 def extend_sys_path():
     PROJECT_DIR = os.path.join(os.path.dirname(__file__))
     APPS_DIR = os.path.join(PROJECT_DIR, "..", "apps")
+    DEVELOP_APPS_DIR = os.path.join(PROJECT_DIR, "..", "develop-apps")
+    sys.path.insert(0, DEVELOP_APPS_DIR)
     sys.path.insert(0, APPS_DIR)
 
     PLUGINS_DIR = os.getenv("SELLNOV_PLUGINS_DIR")

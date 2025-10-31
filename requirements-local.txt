@@ -1,3 +1,0 @@
-git+ssh://marcinn@bitbucket.org/marcinn/sellnov-invoices.git#sellnov-invoices=0.7.1
-git+ssh://marcinn@bitbucket.org/marcinn/sellnov-worklog.git#sellnov-worklog=0.2
-git+ssh://marcinn@bitbucket.org/marcinn/sellnov-tickets.git#sellnov-tickets=0.2

@@ -91,7 +91,8 @@ class DocumentAdmin(admin.ModelAdmin):
         pdf = invoice.as_pdf({"copy": request.GET.get("copy")})
         copy = "_kopia" if request.GET.get("copy") else ""
         filename = filesanitize.safe_path(
-            "%s_%s%s.pdf" % (invoice._meta.verbose_name, invoice.number_fmt, copy)
+            "%s_%s%s.pdf" % (invoice._meta.verbose_name,
+                             invoice.number_fmt, copy)
         )
         resp = HttpResponse(content=pdf.read(), content_type="application/pdf")
         resp["Content-Disposition"] = "filename=%s" % filename
@@ -100,7 +101,8 @@ class DocumentAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super(DocumentAdmin, self).get_urls()
         my_urls = [
-            path("<int:object_id>/print/", admin.site.admin_view(self.print_document))
+            path("<int:object_id>/print/",
+                 admin.site.admin_view(self.print_document))
         ]
         return list(my_urls) + urls
 
@@ -112,7 +114,8 @@ class DocumentAdmin(admin.ModelAdmin):
             try:
                 add_form = self.add_form
             except AttributeError:
-                add_form = forms.modelform_factory(self.model, form=AddDocumentForm)
+                add_form = forms.modelform_factory(
+                    self.model, form=AddDocumentForm)
             kwargs["form"] = add_form
         return super(DocumentAdmin, self).get_form(request, obj=obj, **kwargs)
 
@@ -191,9 +194,15 @@ class DocumentAdmin(admin.ModelAdmin):
             owner_data = model_to_dict(owner)
             owner_data.pop("id", None)
             owner_data.pop("pk", None)
-            owner_data.pop("employers", None)
-            owner_data["document"] = obj
-            owner_data["owner"] = owner
-            DocumentOwner.objects.create(**owner_data)
+
+            supported_fields = [x.name for x in DocumentOwner._meta.fields]
+            final_owner_data = {}
+            for field_name in owner_data:
+                if field_name in supported_fields:
+                    final_owner_data[field_name] = owner_data[field_name]
+
+            final_owner_data["document"] = obj
+            final_owner_data["owner"] = owner
+            DocumentOwner.objects.create(**final_owner_data)
 
         return ret

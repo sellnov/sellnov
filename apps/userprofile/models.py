@@ -23,28 +23,48 @@ class AbstractBusinessEntity(models.Model):
 
 class BusinessEntity(AbstractBusinessEntity):
     owner = models.OneToOneField(
-            'auth.User', related_name='business_entity',
-            on_delete=models.CASCADE, null=True, blank=True)
+        "auth.User",
+        related_name="business_entity",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
     employers = models.ManyToManyField(
-        'auth.User', related_name='works_in', null=True, blank=True)
+        "auth.User", related_name="works_in", null=True, blank=True
+    )
+    default_transfer_payment_type = models.ForeignKey(
+        "payments.PaymentType",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    default_cash_payment_type = models.ForeignKey(
+        "payments.PaymentType",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
 
     class Meta:
-        verbose_name = 'Podmiot gospodarczy'
-        verbose_name_plural = 'Podmioty gospodarcze'
-        swappable = 'SELLNOV_BUSINESS_ENTITY_MODEL'
+        verbose_name = "Podmiot gospodarczy"
+        verbose_name_plural = "Podmioty gospodarcze"
+        swappable = "SELLNOV_BUSINESS_ENTITY_MODEL"
 
     def __str__(self):
         return self.name
 
 
 class Role(models.Model):
-    name = models.CharField(max_length=64, verbose_name='nazwa')
+    name = models.CharField(max_length=64, verbose_name="nazwa")
     manhour_price = models.PositiveIntegerField(
-                    verbose_name=u'cena sprzedaży roboczogodziny')
+        verbose_name="cena sprzedaży roboczogodziny"
+    )
 
     class Meta:
-        verbose_name = 'rola'
-        verbose_name_plural = 'role'
+        verbose_name = "rola"
+        verbose_name_plural = "role"
 
     def __str__(self):
         return self.name
@@ -52,33 +72,36 @@ class Role(models.Model):
 
 class AssociateRoleCosts(models.Model):
     role = models.ForeignKey(
-            Role, on_delete=models.CASCADE,
-            verbose_name='rola')
+        Role, on_delete=models.CASCADE, verbose_name="rola")
     associate = models.ForeignKey(
-            'userprofile.Associate', on_delete=models.CASCADE,
-            verbose_name=u'współpracownik')
+        "userprofile.Associate", on_delete=models.CASCADE, verbose_name="współpracownik"
+    )
     manhour_cost = models.PositiveIntegerField(
-            verbose_name='koszt roboczogodziny')
+        verbose_name="koszt roboczogodziny")
 
     def __str__(self):
-        return u'%s (%s): %szł' % (
-                self.associate, self.role, self.manhour_cost)
+        return "%s (%s): %szł" % (self.associate, self.role, self.manhour_cost)
 
 
 class Associate(models.Model):
     user = models.ForeignKey(
-            'auth.User', null=True, blank=True, on_delete=models.SET_NULL,
-            verbose_name='konto')
-    name = models.CharField(max_length=120, verbose_name='nazwisko')
+        "auth.User",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name="konto",
+    )
+    name = models.CharField(max_length=120, verbose_name="nazwisko")
     roles = models.ManyToManyField(
-            Role, through=AssociateRoleCosts,
-            verbose_name='role')
+        Role, through=AssociateRoleCosts, verbose_name="role"
+    )
     default_manhour_cost = models.PositiveIntegerField(
-            verbose_name=u'domyślny koszt roboczogodziny')
+        verbose_name="domyślny koszt roboczogodziny"
+    )
 
     class Meta:
-        verbose_name = u'współpracownik'
-        verbose_name_plural = u'współpracownicy'
+        verbose_name = "współpracownik"
+        verbose_name_plural = "współpracownicy"
 
     def __str__(self):
         return self.name

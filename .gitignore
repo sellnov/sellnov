@@ -6,5 +6,6 @@
 /sellnov-client/resources
 *.swp
 /sellnov/static
-/sellnov/settings_local.py
+/sellnov/local.py
 /develop-apps
+/*.egg-info
