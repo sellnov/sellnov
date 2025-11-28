@@ -7,12 +7,8 @@ clear:
 env-activate:
 	(source env/bin/activate)
 
-development : env-activate requirements.txt
-
-requirements.txt :
-	(source env/bin/activate && pip install pip --upgrade)
-	(source env/bin/activate && pip install -r $@)
-	(source env/bin/activate && pip install -r requirements-local.txt)
+development : env-activate
+	(source env/bin/activate && pip install -e .)
 
 runserver:
 	(source env/bin/activate && ./manage runserver 0.0.0.0:7000)
